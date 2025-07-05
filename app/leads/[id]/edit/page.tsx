@@ -1,12 +1,12 @@
 import { Header } from "@/components/header"
-import { DashboardContent } from "@/components/dashboard-content"
+import { EditLeadContent } from "@/components/edit-lead-content"
 
-export default function Dashboard() {
+export default function EditLead({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-background cyber-grid">
       <Header />
       <main className="container mx-auto px-6 py-8">
-        <DashboardContent />
+        <EditLeadContent leadId={params.id} />
       </main>
     </div>
   )
