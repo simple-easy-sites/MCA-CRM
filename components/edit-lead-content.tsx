@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
 import { ArrowLeft, Save, Plus, Trash2, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -42,12 +43,31 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     has_mca_history: false,
     default_details: "",
     stage: "Initial Contact",
-    next_followup: "",
+    next_followup_date: "",
+    next_followup_time: "09:00",
+    followup_priority: "medium",
+    followup_notes: "",
     internal_notes: "",
   })
 
   useEffect(() => {
     if (lead) {
+      // Split next_followup into date and time components
+      let followupDate = ""
+      let followupTime = "09:00"
+      
+      if (lead.next_followup && lead.next_followup.trim() !== "") {
+        try {
+          const followupDateTime = new Date(lead.next_followup)
+          if (!isNaN(followupDateTime.getTime())) {
+            followupDate = followupDateTime.toISOString().split('T')[0]
+            followupTime = followupDateTime.toTimeString().slice(0, 5)
+          }
+        } catch (error) {
+          console.error('Error parsing follow-up date:', error)
+        }
+      }
+
       setFormData({
         business_name: lead.business_name,
         owner_name: lead.owner_name,
@@ -61,7 +81,10 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         has_mca_history: lead.has_mca_history,
         default_details: lead.default_details,
         stage: lead.stage,
-        next_followup: lead.next_followup,
+        next_followup_date: followupDate,
+        next_followup_time: followupTime,
+        followup_priority: lead.followup_priority || "medium",
+        followup_notes: lead.followup_notes || "",
         internal_notes: lead.internal_notes,
       })
       setPositions(lead.current_positions)
@@ -117,9 +140,32 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
+      // Combine date and time into proper datetime format
+      let nextFollowup = ""
+      if (formData.next_followup_date) {
+        nextFollowup = formData.next_followup_time 
+          ? `${formData.next_followup_date}T${formData.next_followup_time}:00`
+          : `${formData.next_followup_date}T09:00:00`
+      }
+
       const updatedLead: Lead = {
         ...lead,
-        ...formData,
+        business_name: formData.business_name,
+        owner_name: formData.owner_name,
+        phone: formData.phone,
+        email: formData.email,
+        business_type: formData.business_type,
+        funding_amount: formData.funding_amount,
+        monthly_revenue: formData.monthly_revenue,
+        funding_purpose: formData.funding_purpose,
+        payback_time: formData.payback_time,
+        has_mca_history: formData.has_mca_history,
+        default_details: formData.default_details,
+        stage: formData.stage,
+        next_followup: nextFollowup,
+        followup_priority: formData.followup_priority as "low" | "medium" | "high" | "urgent",
+        followup_notes: formData.followup_notes,
+        internal_notes: formData.internal_notes,
         current_positions: positions,
         updated_at: new Date().toISOString(),
       }
@@ -425,14 +471,55 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Next Follow-up</Label>
+                  <Label className="text-sm font-semibold text-white">Next Follow-up Date</Label>
                   <Input
                     type="date"
                     className="glow-input"
-                    value={formData.next_followup}
-                    onChange={(e) => handleInputChange("next_followup", e.target.value)}
+                    value={formData.next_followup_date}
+                    onChange={(e) => handleInputChange("next_followup_date", e.target.value)}
                   />
                 </div>
+                {formData.next_followup_date && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Follow-up Time</Label>
+                      <TimePicker
+                        value={formData.next_followup_time}
+                        onChange={(time) => handleInputChange("next_followup_time", time)}
+                        placeholder="Select time"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <TimePickerQuick
+                        value={formData.next_followup_time}
+                        onChange={(time) => handleInputChange("next_followup_time", time)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Follow-up Priority</Label>
+                      <Select value={formData.followup_priority} onValueChange={(value) => handleInputChange("followup_priority", value)}>
+                        <SelectTrigger className="glow-input">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low Priority</SelectItem>
+                          <SelectItem value="medium">Medium Priority</SelectItem>
+                          <SelectItem value="high">High Priority</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Follow-up Notes</Label>
+                      <Textarea
+                        placeholder="Notes about what to discuss during follow-up..."
+                        className="glow-input min-h-[80px]"
+                        value={formData.followup_notes}
+                        onChange={(e) => handleInputChange("followup_notes", e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 

@@ -32,6 +32,8 @@ export interface Lead {
     | "Offer Presented"
     | "Closed"
   next_followup: string
+  followup_priority: "low" | "medium" | "high" | "urgent"
+  followup_notes: string
   internal_notes: string
   created_at: string
   updated_at: string

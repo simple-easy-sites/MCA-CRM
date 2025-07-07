@@ -28,27 +28,41 @@ export function DashboardContent() {
   
   // Calculate follow-ups more comprehensively
   const today = new Date()
-  today.setHours(0, 0, 0, 0) // Start of today
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+  
+  console.log('📊 Dashboard: Calculating follow-ups for', leads.length, 'leads')
   
   const followUpsDue = leads.filter((lead) => {
-    if (!lead.next_followup) return false
-    const followUpDate = new Date(lead.next_followup)
-    followUpDate.setHours(0, 0, 0, 0) // Start of follow-up day
-    // Show follow-ups that are today or overdue
-    return followUpDate <= today
+    if (!lead.next_followup || lead.next_followup.trim() === '') return false
+    try {
+      const followUpDate = new Date(lead.next_followup)
+      if (isNaN(followUpDate.getTime())) return false // Invalid date
+      console.log('📅 Lead:', lead.business_name, 'Follow-up:', followUpDate.toLocaleString(), 'Due?', followUpDate <= todayEnd)
+      // Show follow-ups that are today or overdue
+      return followUpDate <= todayEnd
+    } catch (error) {
+      console.error('Error parsing follow-up date for', lead.business_name, ':', error)
+      return false
+    }
   }).length
   
   const upcomingFollowUps = leads.filter((lead) => {
-    if (!lead.next_followup) return false
-    const followUpDate = new Date(lead.next_followup)
-    followUpDate.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    const nextWeek = new Date(today)
-    nextWeek.setDate(nextWeek.getDate() + 7)
-    // Show follow-ups in the next 7 days (but not today)
-    return followUpDate > today && followUpDate <= nextWeek
+    if (!lead.next_followup || lead.next_followup.trim() === '') return false
+    try {
+      const followUpDate = new Date(lead.next_followup)
+      if (isNaN(followUpDate.getTime())) return false // Invalid date
+      const nextWeek = new Date(todayEnd)
+      nextWeek.setDate(nextWeek.getDate() + 7)
+      // Show follow-ups in the next 7 days (but not today)
+      return followUpDate > todayEnd && followUpDate <= nextWeek
+    } catch (error) {
+      console.error('Error parsing follow-up date for', lead.business_name, ':', error)
+      return false
+    }
   }).length
+  
+  console.log('📊 Dashboard stats:', { followUpsDue, upcomingFollowUps })
 
   const inPipeline = leads.filter((lead) => !["Closed", "Initial Contact"].includes(lead.stage)).length
 

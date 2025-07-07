@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
 import { ArrowLeft, Calendar, Save, Loader2, Clock } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -29,7 +30,7 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
 
   const [formData, setFormData] = useState({
     followup_date: "",
-    followup_time: "",
+    followup_time: "09:00",
     followup_type: "call",
     priority: "medium",
     notes: "",
@@ -74,9 +75,11 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
       const updatedLead = {
         ...lead,
         next_followup: dateTimeString,
+        followup_priority: formData.priority as "low" | "medium" | "high" | "urgent",
+        followup_notes: formData.notes,
         internal_notes: lead.internal_notes
-          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} - ${formData.notes}`
-          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} - ${formData.notes}`,
+          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`
+          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`,
         updated_at: new Date().toISOString(),
       }
 
@@ -186,13 +189,20 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold text-white">Follow-up Time</Label>
-                  <Input
-                    type="time"
-                    className="glow-input"
+                  <TimePicker
                     value={formData.followup_time}
-                    onChange={(e) => handleInputChange("followup_time", e.target.value)}
+                    onChange={(time) => handleInputChange("followup_time", time)}
+                    placeholder="Select time"
                   />
                 </div>
+              </div>
+
+              {/* Quick Time Selection */}
+              <div className="space-y-2">
+                <TimePickerQuick
+                  value={formData.followup_time}
+                  onChange={(time) => handleInputChange("followup_time", time)}
+                />
               </div>
 
               {/* Follow-up Type and Priority */}

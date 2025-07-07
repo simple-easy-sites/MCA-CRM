@@ -39,6 +39,8 @@ export const leadService = {
         payback_time: lead.payback_time || '',
         default_details: lead.default_details || '',
         next_followup: lead.next_followup || '',
+        followup_priority: lead.followup_priority || 'medium',
+        followup_notes: lead.followup_notes || '',
         internal_notes: lead.internal_notes || ''
       }))
     } catch (error) {
@@ -79,6 +81,8 @@ export const leadService = {
         payback_time: lead.payback_time || '',
         default_details: lead.default_details || '',
         next_followup: lead.next_followup || '',
+        followup_priority: lead.followup_priority || 'medium',
+        followup_notes: lead.followup_notes || '',
         internal_notes: lead.internal_notes || ''
       }
     } catch (error) {
@@ -107,6 +111,8 @@ export const leadService = {
         payback_time: leadWithoutPositions.payback_time || null,
         default_details: leadWithoutPositions.default_details || null,
         next_followup: leadWithoutPositions.next_followup || null, // This fixes the date error!
+        followup_priority: leadWithoutPositions.followup_priority || null,
+        followup_notes: leadWithoutPositions.followup_notes || null,
         internal_notes: leadWithoutPositions.internal_notes || null
       }
       
@@ -150,6 +156,8 @@ export const leadService = {
         payback_time: newLead.payback_time || '',
         default_details: newLead.default_details || '',
         next_followup: newLead.next_followup || '',
+        followup_priority: newLead.followup_priority || 'medium',
+        followup_notes: newLead.followup_notes || '',
         internal_notes: newLead.internal_notes || ''
       }
     } catch (error) {
@@ -196,6 +204,8 @@ export const leadService = {
         payback_time: updatedLead.payback_time || '',
         default_details: updatedLead.default_details || '',
         next_followup: updatedLead.next_followup || '',
+        followup_priority: updatedLead.followup_priority || 'medium',
+        followup_notes: updatedLead.followup_notes || '',
         internal_notes: updatedLead.internal_notes || ''
       }
     } catch (error) {
@@ -254,6 +264,8 @@ export const leadService = {
         payback_time: lead.payback_time || '',
         default_details: lead.default_details || '',
         next_followup: lead.next_followup || '',
+        followup_priority: lead.followup_priority || 'medium',
+        followup_notes: lead.followup_notes || '',
         internal_notes: lead.internal_notes || ''
       }))
     } catch (error) {

@@ -20,6 +20,8 @@ export interface Database {
           default_details: string | null
           stage: string
           next_followup: string | null
+          followup_priority: string | null
+          followup_notes: string | null
           internal_notes: string | null
           created_at: string
           updated_at: string
@@ -42,6 +44,8 @@ export interface Database {
           default_details?: string | null
           stage?: string
           next_followup?: string | null
+          followup_priority?: string | null
+          followup_notes?: string | null
           internal_notes?: string | null
           created_at?: string
           updated_at?: string
@@ -64,6 +68,8 @@ export interface Database {
           default_details?: string | null
           stage?: string
           next_followup?: string | null
+          followup_priority?: string | null
+          followup_notes?: string | null
           internal_notes?: string | null
           created_at?: string
           updated_at?: string

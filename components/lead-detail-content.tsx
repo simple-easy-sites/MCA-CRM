@@ -200,6 +200,18 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
               <div class="label">Next Follow-up:</div>
               <div class="value">${formatDate(lead.next_followup)}</div>
             </div>
+            ${lead.next_followup && lead.followup_priority ? `
+            <div class="field">
+              <div class="label">Follow-up Priority:</div>
+              <div class="value">${lead.followup_priority.charAt(0).toUpperCase() + lead.followup_priority.slice(1)} Priority</div>
+            </div>
+            ` : ''}
+            ${lead.followup_notes ? `
+            <div class="field">
+              <div class="label">Follow-up Notes:</div>
+              <div class="value">${lead.followup_notes}</div>
+            </div>
+            ` : ''}
             <div class="field">
               <div class="label">Created:</div>
               <div class="value">${new Date(lead.created_at).toLocaleDateString()}</div>
@@ -521,6 +533,23 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Next Follow-up</label>
                 <p className="text-white font-medium mt-1">{formatDate(lead.next_followup)}</p>
+                {lead.next_followup && lead.followup_priority && (
+                  <div className="mt-1">
+                    <Badge 
+                      className={`text-xs ${
+                        lead.followup_priority === 'urgent' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                        lead.followup_priority === 'high' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                        lead.followup_priority === 'medium' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
+                        'bg-gray-500/20 text-gray-300 border-gray-500/30'
+                      } border font-medium capitalize`}
+                    >
+                      {lead.followup_priority} Priority
+                    </Badge>
+                  </div>
+                )}
+                {lead.followup_notes && (
+                  <p className="text-muted-foreground text-sm mt-1">{lead.followup_notes}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Lead Created</label>

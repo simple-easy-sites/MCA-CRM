@@ -34,6 +34,8 @@ interface FormData {
   default_details: string
   stage: string
   next_followup: string
+  followup_priority: "low" | "medium" | "high" | "urgent"
+  followup_notes: string
   internal_notes: string
 }
 
@@ -67,6 +69,8 @@ export function AddLeadContent() {
     default_details: "",
     stage: "Prospect",
     next_followup: "",
+    followup_priority: "medium",
+    followup_notes: "",
     internal_notes: "",
   })
 
@@ -232,6 +236,8 @@ export function AddLeadContent() {
         default_details: "",
         stage: "Prospect",
         next_followup: "",
+        followup_priority: "medium",
+        followup_notes: "",
         internal_notes: "",
       })
       setPositions([])
@@ -677,6 +683,33 @@ export function AddLeadContent() {
                     onChange={(e) => handleInputChange("next_followup", e.target.value)}
                   />
                 </div>
+                {formData.next_followup && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Follow-up Priority</Label>
+                      <Select value={formData.followup_priority} onValueChange={(value) => handleInputChange("followup_priority", value)}>
+                        <SelectTrigger className="glow-input">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low Priority</SelectItem>
+                          <SelectItem value="medium">Medium Priority</SelectItem>
+                          <SelectItem value="high">High Priority</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Follow-up Notes</Label>
+                      <Textarea
+                        placeholder="Notes about what to discuss during follow-up..."
+                        className="glow-input min-h-[80px]"
+                        value={formData.followup_notes}
+                        onChange={(e) => handleInputChange("followup_notes", e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
