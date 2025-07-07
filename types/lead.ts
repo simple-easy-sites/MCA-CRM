@@ -25,12 +25,13 @@ export interface Lead {
   default_details: string
   stage:
     | "Prospect"
-    | "Initial Contact"
     | "Email Sent"
     | "Bank Statements Received"
     | "Submitted to Underwriting"
     | "Offer Presented"
     | "Closed"
+    | "Cold Lead"
+    | "Not Interested"
   next_followup: string
   followup_priority: "low" | "medium" | "high" | "urgent"
   followup_notes: string

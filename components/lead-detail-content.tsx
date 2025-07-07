@@ -49,8 +49,6 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
     switch (stage) {
       case "Prospect":
         return "bg-gray-500/20 text-gray-300 border-gray-500/30"
-      case "Initial Contact":
-        return "bg-blue-500/20 text-blue-300 border-blue-500/30"
       case "Email Sent":
         return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
       case "Bank Statements Received":
@@ -61,6 +59,10 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
         return "bg-green-500/20 text-green-300 border-green-500/30"
       case "Closed":
         return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      case "Cold Lead":
+        return "bg-blue-500/20 text-blue-300 border-blue-500/30"
+      case "Not Interested":
+        return "bg-red-500/20 text-red-300 border-red-500/30"
       default:
         return "bg-gray-500/20 text-gray-300 border-gray-500/30"
     }
@@ -601,12 +603,13 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
             <div className="space-y-2">
               {[
                 "Prospect",
-                "Initial Contact",
                 "Email Sent",
                 "Bank Statements Received",
                 "Submitted to Underwriting",
                 "Offer Presented",
                 "Closed",
+                "Cold Lead",
+                "Not Interested",
               ].map((stage) => (
                 <Button
                   key={stage}

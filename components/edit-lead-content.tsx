@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
-import { ArrowLeft, Save, Plus, Trash2, Loader2 } from "lucide-react"
+import { ArrowLeft, Save, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLeads } from "@/contexts/lead-context"
@@ -23,9 +24,10 @@ interface EditLeadContentProps {
 
 export function EditLeadContent({ leadId }: EditLeadContentProps) {
   const router = useRouter()
-  const { getLeadById, updateLead } = useLeads()
+  const { getLeadById, updateLead, deleteLead } = useLeads()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [positions, setPositions] = useState<Position[]>([])
 
   const lead = getLeadById(leadId)
@@ -42,7 +44,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     payback_time: "",
     has_mca_history: false,
     default_details: "",
-    stage: "Initial Contact",
+    stage: "Prospect",
     next_followup_date: "",
     next_followup_time: "09:00",
     followup_priority: "medium",
@@ -143,10 +145,10 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
       // Combine date and time into proper datetime format
       let nextFollowup = ""
       if (formData.next_followup_date) {
-        nextFollowup = formData.next_followup_time 
-          ? `${formData.next_followup_date}T${formData.next_followup_time}:00`
-          : `${formData.next_followup_date}T09:00:00`
+        nextFollowup = `${formData.next_followup_date}T${formData.next_followup_time}:00`
       }
+
+      console.log('🔄 Edit Lead: Updating follow-up to:', nextFollowup)
 
       const updatedLead: Lead = {
         ...lead,
@@ -179,13 +181,35 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
 
       router.push(`/leads/${leadId}`)
     } catch (error) {
+      console.error('❌ Error updating lead:', error)
       toast({
         title: "Error",
-        description: "Failed to update lead. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update lead. Please try again.",
         variant: "destructive",
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    setLoading(true)
+    try {
+      await deleteLead(leadId)
+      toast({
+        title: "Lead Deleted",
+        description: "Lead has been permanently deleted.",
+      })
+      router.push("/leads")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete lead. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+      setShowDeleteDialog(false)
     }
   }
 
@@ -208,6 +232,15 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            className="border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+            onClick={() => setShowDeleteDialog(true)}
+            disabled={loading}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Lead
+          </Button>
           <Button
             variant="outline"
             className="border-white/20 bg-white/5 text-white hover:bg-white/10"
@@ -461,12 +494,14 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Initial Contact">Initial Contact</SelectItem>
+                      <SelectItem value="Prospect">Prospect</SelectItem>
                       <SelectItem value="Email Sent">Email Sent</SelectItem>
                       <SelectItem value="Bank Statements Received">Bank Statements Received</SelectItem>
                       <SelectItem value="Submitted to Underwriting">Submitted to Underwriting</SelectItem>
                       <SelectItem value="Offer Presented">Offer Presented</SelectItem>
                       <SelectItem value="Closed">Closed</SelectItem>
+                      <SelectItem value="Cold Lead">Cold Lead</SelectItem>
+                      <SelectItem value="Not Interested">Not Interested</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -564,6 +599,49 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
           </div>
         </div>
       </form>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="glow-card border-red-500/30">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-red-400" />
+              <span>Delete Lead</span>
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Are you sure you want to delete <strong className="text-white">{lead?.business_name}</strong>? 
+              This action cannot be undone and will permanently remove all lead data, positions, and follow-ups.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={loading}
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              disabled={loading}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Lead
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

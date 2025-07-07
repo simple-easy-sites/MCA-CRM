@@ -65,12 +65,23 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
     setLoading(true)
 
     try {
+      // Validate required fields
+      if (!formData.followup_date) {
+        toast({
+          title: "Validation Error",
+          description: "Please select a follow-up date.",
+          variant: "destructive",
+        })
+        setLoading(false)
+        return
+      }
+
       // Combine date and time into proper datetime format
-      const dateTimeString = formData.followup_time 
-        ? `${formData.followup_date}T${formData.followup_time}:00`
-        : `${formData.followup_date}T09:00:00`
-        
+      const dateTimeString = `${formData.followup_date}T${formData.followup_time}:00`
+      
       console.log('📅 Scheduling follow-up for:', dateTimeString)
+      console.log('📋 Form data:', formData)
+      console.log('👤 Lead data:', lead)
 
       const updatedLead = {
         ...lead,
@@ -83,6 +94,7 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
         updated_at: new Date().toISOString(),
       }
 
+      console.log('🔄 Updating lead with:', updatedLead)
       await updateLead(updatedLead)
 
       toast({
@@ -92,10 +104,10 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
 
       router.push(`/leads/${leadId}`)
     } catch (error) {
-      console.error('Error scheduling follow-up:', error)
+      console.error('❌ Error scheduling follow-up:', error)
       toast({
         title: "Error",
-        description: "Failed to schedule follow-up. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to schedule follow-up. Please try again.",
         variant: "destructive",
       })
     } finally {

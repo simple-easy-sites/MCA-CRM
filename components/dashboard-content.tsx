@@ -62,9 +62,24 @@ export function DashboardContent() {
     }
   }).length
   
-  console.log('📊 Dashboard stats:', { followUpsDue, upcomingFollowUps })
+  // Total follow-ups (due + upcoming)
+  const totalFollowUps = leads.filter((lead) => {
+    if (!lead.next_followup || lead.next_followup.trim() === '') return false
+    try {
+      const followUpDate = new Date(lead.next_followup)
+      return !isNaN(followUpDate.getTime())
+    } catch (error) {
+      return false
+    }
+  }).length
+  
+  console.log('📊 Dashboard stats:', { followUpsDue, upcomingFollowUps, totalFollowUps })
 
-  const inPipeline = leads.filter((lead) => !["Closed", "Initial Contact"].includes(lead.stage)).length
+  // Pipeline should only include leads from "Email Sent" stage onwards (not Prospect)
+  const inPipeline = leads.filter((lead) => {
+    const pipelineStages = ["Email Sent", "Bank Statements Received", "Submitted to Underwriting", "Offer Presented"]
+    return pipelineStages.includes(lead.stage)
+  }).length
 
   const closedThisMonth = leads.filter((lead) => {
     if (lead.stage !== "Closed") return false
@@ -75,8 +90,8 @@ export function DashboardContent() {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case "Initial Contact":
-        return "bg-blue-500/20 text-blue-300 border-blue-500/30"
+      case "Prospect":
+        return "bg-gray-500/20 text-gray-300 border-gray-500/30"
       case "Email Sent":
         return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
       case "Bank Statements Received":
@@ -87,6 +102,10 @@ export function DashboardContent() {
         return "bg-green-500/20 text-green-300 border-green-500/30"
       case "Closed":
         return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+      case "Cold Lead":
+        return "bg-blue-500/20 text-blue-300 border-blue-500/30"
+      case "Not Interested":
+        return "bg-red-500/20 text-red-300 border-red-500/30"
       default:
         return "bg-gray-500/20 text-gray-300 border-gray-500/30"
     }
@@ -136,9 +155,12 @@ export function DashboardContent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Follow-ups</p>
-              <p className="text-3xl font-bold text-white mt-2">{followUpsDue}</p>
+              <p className="text-3xl font-bold text-white mt-2">{totalFollowUps}</p>
+              {followUpsDue > 0 && (
+                <p className="text-sm text-red-400">{followUpsDue} due now</p>
+              )}
               {upcomingFollowUps > 0 && (
-                <p className="text-sm text-blue-400">+{upcomingFollowUps} upcoming</p>
+                <p className="text-sm text-blue-400">{upcomingFollowUps} upcoming</p>
               )}
             </div>
             <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center border border-orange-500/30 group-hover:shadow-glow">
@@ -146,10 +168,14 @@ export function DashboardContent() {
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            {followUpsDue > 0 ? (
-              <span className="text-orange-400 font-medium">{followUpsDue} due now</span>
-            ) : upcomingFollowUps > 0 ? (
-              <span className="text-blue-400 font-medium">{upcomingFollowUps} this week</span>
+            {totalFollowUps > 0 ? (
+              followUpsDue > 0 ? (
+                <span className="text-orange-400 font-medium">{followUpsDue} due now</span>
+              ) : upcomingFollowUps > 0 ? (
+                <span className="text-blue-400 font-medium">{upcomingFollowUps} upcoming</span>
+              ) : (
+                <span className="text-green-400 font-medium">All follow-ups scheduled</span>
+              )
             ) : (
               <span className="text-muted-foreground">No follow-ups scheduled</span>
             )}

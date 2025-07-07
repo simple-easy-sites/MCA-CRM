@@ -665,12 +665,13 @@ export function AddLeadContent() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Prospect">Prospect</SelectItem>
-                      <SelectItem value="Initial Contact">Initial Contact</SelectItem>
                       <SelectItem value="Email Sent">Email Sent</SelectItem>
                       <SelectItem value="Bank Statements Received">Bank Statements Received</SelectItem>
                       <SelectItem value="Submitted to Underwriting">Submitted to Underwriting</SelectItem>
                       <SelectItem value="Offer Presented">Offer Presented</SelectItem>
                       <SelectItem value="Closed">Closed</SelectItem>
+                      <SelectItem value="Cold Lead">Cold Lead</SelectItem>
+                      <SelectItem value="Not Interested">Not Interested</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
