@@ -669,9 +669,9 @@ export function AddLeadContent() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Next Follow-up</Label>
+                  <Label className="text-sm font-semibold text-white">Next Follow-up (Date & Time)</Label>
                   <Input
-                    type="date"
+                    type="datetime-local"
                     className="glow-input"
                     value={formData.next_followup}
                     onChange={(e) => handleInputChange("next_followup", e.target.value)}
@@ -691,10 +691,12 @@ export function AddLeadContent() {
                   onClick={() => {
                     const tomorrow = new Date()
                     tomorrow.setDate(tomorrow.getDate() + 1)
-                    handleInputChange("next_followup", tomorrow.toISOString().split("T")[0])
+                    tomorrow.setHours(9, 0, 0, 0) // Set to 9:00 AM
+                    const isoString = tomorrow.toISOString().slice(0, 16) // Format for datetime-local
+                    handleInputChange("next_followup", isoString)
                   }}
                 >
-                  Schedule Follow-up Call
+                  Schedule Follow-up Call (9 AM Tomorrow)
                 </Button>
                 <Button
                   type="button"

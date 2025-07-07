@@ -25,11 +25,29 @@ export function DashboardContent() {
   )
 
   const totalLeads = leads.length
+  
+  // Calculate follow-ups more comprehensively
+  const today = new Date()
+  today.setHours(0, 0, 0, 0) // Start of today
+  
   const followUpsDue = leads.filter((lead) => {
     if (!lead.next_followup) return false
     const followUpDate = new Date(lead.next_followup)
-    const today = new Date()
+    followUpDate.setHours(0, 0, 0, 0) // Start of follow-up day
+    // Show follow-ups that are today or overdue
     return followUpDate <= today
+  }).length
+  
+  const upcomingFollowUps = leads.filter((lead) => {
+    if (!lead.next_followup) return false
+    const followUpDate = new Date(lead.next_followup)
+    followUpDate.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const nextWeek = new Date(today)
+    nextWeek.setDate(nextWeek.getDate() + 7)
+    // Show follow-ups in the next 7 days (but not today)
+    return followUpDate > today && followUpDate <= nextWeek
   }).length
 
   const inPipeline = leads.filter((lead) => !["Closed", "Initial Contact"].includes(lead.stage)).length
@@ -100,11 +118,14 @@ export function DashboardContent() {
           </div>
         </Card>
 
-        <Card className="glow-card p-6 group">
+        <Card className="glow-card p-6 group" onClick={() => router.push("/follow-ups")} style={{cursor: 'pointer'}}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Follow-ups Due</p>
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Follow-ups</p>
               <p className="text-3xl font-bold text-white mt-2">{followUpsDue}</p>
+              {upcomingFollowUps > 0 && (
+                <p className="text-sm text-blue-400">+{upcomingFollowUps} upcoming</p>
+              )}
             </div>
             <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center border border-orange-500/30 group-hover:shadow-glow">
               <Clock className="w-6 h-6 text-orange-400" />
@@ -112,9 +133,11 @@ export function DashboardContent() {
           </div>
           <div className="mt-4 flex items-center text-sm">
             {followUpsDue > 0 ? (
-              <span className="text-orange-400 font-medium">{followUpsDue} need attention</span>
+              <span className="text-orange-400 font-medium">{followUpsDue} due now</span>
+            ) : upcomingFollowUps > 0 ? (
+              <span className="text-blue-400 font-medium">{upcomingFollowUps} this week</span>
             ) : (
-              <span className="text-muted-foreground">No follow-ups due</span>
+              <span className="text-muted-foreground">No follow-ups scheduled</span>
             )}
           </div>
         </Card>

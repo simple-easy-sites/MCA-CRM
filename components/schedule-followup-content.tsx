@@ -64,29 +64,32 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
     setLoading(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Combine date and time
-      const followupDateTime = `${formData.followup_date}T${formData.followup_time || "09:00"}`
+      // Combine date and time into proper datetime format
+      const dateTimeString = formData.followup_time 
+        ? `${formData.followup_date}T${formData.followup_time}:00`
+        : `${formData.followup_date}T09:00:00`
+        
+      console.log('📅 Scheduling follow-up for:', dateTimeString)
 
       const updatedLead = {
         ...lead,
-        next_followup: followupDateTime,
+        next_followup: dateTimeString,
         internal_notes: lead.internal_notes
-          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(followupDateTime).toLocaleDateString()} at ${formData.followup_time || "9:00 AM"} - ${formData.notes}`
-          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(followupDateTime).toLocaleDateString()} at ${formData.followup_time || "9:00 AM"} - ${formData.notes}`,
+          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} - ${formData.notes}`
+          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} - ${formData.notes}`,
         updated_at: new Date().toISOString(),
       }
 
-      updateLead(updatedLead)
+      await updateLead(updatedLead)
 
       toast({
         title: "Follow-up Scheduled!",
-        description: `Follow-up scheduled for ${new Date(followupDateTime).toLocaleDateString()} at ${formData.followup_time || "9:00 AM"}`,
+        description: `Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()}`,
       })
 
       router.push(`/leads/${leadId}`)
     } catch (error) {
+      console.error('Error scheduling follow-up:', error)
       toast({
         title: "Error",
         description: "Failed to schedule follow-up. Please try again.",
