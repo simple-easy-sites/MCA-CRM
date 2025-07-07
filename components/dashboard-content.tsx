@@ -4,16 +4,18 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Users, Clock, Phone, Zap, Activity, Target, Filter, Mail } from "lucide-react"
+import { Plus, Search, Users, Clock, Phone, Zap, Activity, Target, Filter, Mail, Bug } from "lucide-react"
 import { useLeads } from "@/contexts/lead-context"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { formatCurrencyAbbreviated, formatPhoneNumber } from "@/lib/format-utils"
+import { SupabaseTestComponent } from "@/components/supabase-test"
 
 export function DashboardContent() {
   const { leads } = useLeads()
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
+  const [showDebug, setShowDebug] = useState(false)
 
   const filteredLeads = leads.filter(
     (lead) =>
@@ -323,6 +325,37 @@ export function DashboardContent() {
           </div>
         )}
       </Card>
+
+      {/* Debug Section - Show if there are issues or explicitly requested */}
+      {(totalLeads === 0 || showDebug) && (
+        <Card className="glow-card p-6 border-yellow-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white flex items-center">
+              <Bug className="w-5 h-5 mr-2 text-yellow-400" />
+              Database Connection Diagnostics
+            </h3>
+            <Button
+              onClick={() => setShowDebug(!showDebug)}
+              variant="outline"
+              className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+            >
+              {showDebug ? 'Hide' : 'Show'} Diagnostics
+            </Button>
+          </div>
+          
+          {showDebug && (
+            <div>
+              <p className="text-yellow-300 mb-4">
+                {totalLeads === 0 
+                  ? "📊 No leads found. Run diagnostics to test your Supabase connection."
+                  : "🔧 Use these tools to test and debug your database connection."
+                }
+              </p>
+              <SupabaseTestComponent />
+            </div>
+          )}
+        </Card>
+      )}
     </div>
   )
 }

@@ -90,8 +90,10 @@ export const leadService = {
   // Create a new lead
   async createLead(leadData: LeadInsert): Promise<Lead> {
     try {
+      console.log('📊 Supabase: Creating lead with data:', leadData)
       // Separate positions from lead data
       const { current_positions, ...leadWithoutPositions } = leadData
+      console.log('📊 Lead data without positions:', leadWithoutPositions)
 
       // Insert the lead first
       const { data: newLead, error: leadError } = await supabase
@@ -100,12 +102,20 @@ export const leadService = {
         .select()
         .single()
 
-      if (leadError) throw leadError
+      if (leadError) {
+        console.error('❌ Supabase lead insert error:', leadError)
+        throw leadError
+      }
+      console.log('✅ Supabase: Lead inserted successfully:', newLead)
 
       // Insert positions if any
       let positions: Position[] = []
       if (current_positions && current_positions.length > 0) {
+        console.log('📊 Creating positions for lead:', current_positions)
         positions = await positionService.createPositions(newLead.id, current_positions)
+        console.log('✅ Positions created successfully:', positions)
+      } else {
+        console.log('📊 No positions to create')
       }
 
       return {

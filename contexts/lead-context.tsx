@@ -106,13 +106,15 @@ export function LeadProvider({ children }: { children: React.ReactNode }) {
 
   const addLead = async (leadData: Omit<Lead, "id" | "created_at" | "updated_at">) => {
     try {
+      console.log("🚀 Adding lead:", leadData)
       dispatch({ type: "SET_LOADING", payload: true })
       dispatch({ type: "SET_ERROR", payload: null })
       
       const newLead = await leadService.createLead(leadData)
+      console.log("✅ Lead created successfully:", newLead)
       dispatch({ type: "ADD_LEAD", payload: newLead })
     } catch (error) {
-      console.error("Error adding lead:", error)
+      console.error("❌ Error adding lead:", error)
       dispatch({ type: "SET_ERROR", payload: "Failed to add lead" })
       throw error
     }

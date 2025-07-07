@@ -197,15 +197,13 @@ export function AddLeadContent() {
     setLoading(true)
 
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       const leadData = {
         ...formData,
         current_positions: positions,
       }
 
-      addLead(leadData)
+      // Wait for the lead to be saved to Supabase
+      await addLead(leadData)
 
       // Clear draft
       localStorage.removeItem("mca-crm-draft")
@@ -242,9 +240,10 @@ export function AddLeadContent() {
       // Navigate to leads page
       router.push("/leads")
     } catch (error) {
+      console.error("Error saving lead:", error)
       toast({
         title: "Error",
-        description: "Failed to save lead. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save lead. Please try again.",
         variant: "destructive",
       })
     } finally {
