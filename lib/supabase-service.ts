@@ -93,12 +93,29 @@ export const leadService = {
       console.log('📊 Supabase: Creating lead with data:', leadData)
       // Separate positions from lead data
       const { current_positions, ...leadWithoutPositions } = leadData
-      console.log('📊 Lead data without positions:', leadWithoutPositions)
+      
+      // Clean up the data - convert empty strings to null for database
+      const cleanedLeadData = {
+        ...leadWithoutPositions,
+        email: leadWithoutPositions.email || null,
+        business_type: leadWithoutPositions.business_type || null,
+        business_type_details: leadWithoutPositions.business_type_details || null,
+        credit_score: leadWithoutPositions.credit_score || null,
+        funding_amount: leadWithoutPositions.funding_amount || null,
+        monthly_revenue: leadWithoutPositions.monthly_revenue || null,
+        funding_purpose: leadWithoutPositions.funding_purpose || null,
+        payback_time: leadWithoutPositions.payback_time || null,
+        default_details: leadWithoutPositions.default_details || null,
+        next_followup: leadWithoutPositions.next_followup || null, // This fixes the date error!
+        internal_notes: leadWithoutPositions.internal_notes || null
+      }
+      
+      console.log('📊 Cleaned lead data:', cleanedLeadData)
 
       // Insert the lead first
       const { data: newLead, error: leadError } = await supabase
         .from('leads')
-        .insert([leadWithoutPositions])
+        .insert([cleanedLeadData])
         .select()
         .single()
 
