@@ -11,8 +11,67 @@ const navigation = [
   { name: "Add Lead", href: "/add-lead" },
 ]
 
+// Function to get current page info and breadcrumb
+const getCurrentPageInfo = (pathname: string) => {
+  if (pathname === '/') {
+    return {
+      title: 'Dashboard',
+      breadcrumb: 'Dashboard'
+    }
+  }
+  
+  if (pathname === '/leads') {
+    return {
+      title: 'Leads',
+      breadcrumb: 'Dashboard › Leads'
+    }
+  }
+  
+  if (pathname === '/add-lead') {
+    return {
+      title: 'Add Lead',
+      breadcrumb: 'Dashboard › Leads › Add Lead'
+    }
+  }
+  
+  if (pathname.startsWith('/leads/') && pathname.includes('/edit')) {
+    return {
+      title: 'Edit Lead',
+      breadcrumb: 'Dashboard › Leads › Edit Lead'
+    }
+  }
+  
+  if (pathname.startsWith('/leads/') && pathname.includes('/schedule-followup')) {
+    return {
+      title: 'Schedule Follow-up',
+      breadcrumb: 'Dashboard › Leads › Schedule Follow-up'
+    }
+  }
+  
+  if (pathname.startsWith('/leads/') && !pathname.includes('/edit') && !pathname.includes('/schedule-followup')) {
+    return {
+      title: 'Lead Details',
+      breadcrumb: 'Dashboard › Leads › Lead Details'
+    }
+  }
+  
+  if (pathname === '/follow-ups') {
+    return {
+      title: 'Follow-ups',
+      breadcrumb: 'Dashboard › Follow-ups'
+    }
+  }
+  
+  // Default fallback
+  return {
+    title: 'MCA CRM',
+    breadcrumb: 'Dashboard'
+  }
+}
+
 export function Header() {
   const pathname = usePathname()
+  const pageInfo = getCurrentPageInfo(pathname)
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-white/10">
@@ -28,9 +87,16 @@ export function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white tracking-tight">
-                Jon's <span className="gradient-text">CRM</span>
+                MCA CRM <span className="gradient-text">Lead Management Platform</span>
               </h1>
-              <div className="text-xs text-muted-foreground font-medium">Lead Management Platform</div>
+              <div className="text-xs text-muted-foreground font-medium">{pageInfo.breadcrumb}</div>
+            </div>
+          </div>
+
+          {/* Current Page Title */}
+          <div className="hidden md:flex items-center">
+            <div className="text-lg font-semibold text-white">
+              {pageInfo.title}
             </div>
           </div>
 

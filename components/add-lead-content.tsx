@@ -14,6 +14,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLeads } from "@/contexts/lead-context"
 import { useToast } from "@/hooks/use-toast"
+import { TimezoneSelector } from "@/components/timezone-selector"
 import type { Position } from "@/types/lead"
 
 interface FormData {
@@ -37,7 +38,7 @@ interface FormData {
   followup_priority: "low" | "medium" | "high" | "urgent"
   followup_notes: string
   internal_notes: string
-  client_timezone: string // NEW: Client's timezone
+  client_timezone: string
 }
 
 interface FormErrors {
@@ -73,7 +74,7 @@ export function AddLeadContent() {
     followup_priority: "medium",
     followup_notes: "",
     internal_notes: "",
-    client_timezone: "America/New_York", // Default to Eastern Time
+    client_timezone: "America/New_York",
   })
 
   // Auto-focus first field
@@ -120,7 +121,6 @@ export function AddLeadContent() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
 
-    // Only required fields: business name, owner name, phone
     if (!formData.business_name.trim()) {
       newErrors.business_name = "Business name is required"
     }
@@ -133,12 +133,10 @@ export function AddLeadContent() {
       newErrors.phone = "Please enter a valid phone number"
     }
 
-    // Optional email validation
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address"
     }
 
-    // Validate positions if any exist
     positions.forEach((position, index) => {
       if (position.lender_name && position.original_amount <= 0) {
         newErrors[`position_${index}_original`] = "Original amount must be greater than 0"
@@ -154,7 +152,6 @@ export function AddLeadContent() {
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
     }
@@ -178,7 +175,6 @@ export function AddLeadContent() {
 
   const updatePosition = (id: string, field: keyof Position, value: any) => {
     setPositions(positions.map((pos) => (pos.id === id ? { ...pos, [field]: value } : pos)))
-    // Clear position errors
     const positionIndex = positions.findIndex((pos) => pos.id === id)
     if (positionIndex !== -1) {
       const errorKey = `position_${positionIndex}_${field === "lender_name" ? "lender" : field === "original_amount" ? "original" : "balance"}`
@@ -208,10 +204,7 @@ export function AddLeadContent() {
         current_positions: positions,
       }
 
-      // Wait for the lead to be saved to Supabase
       await addLead(leadData)
-
-      // Clear draft
       localStorage.removeItem("mca-crm-draft")
 
       toast({
@@ -219,7 +212,6 @@ export function AddLeadContent() {
         description: "Lead has been saved successfully.",
       })
 
-      // Reset form
       setFormData({
         business_name: "",
         owner_name: "",
@@ -241,12 +233,11 @@ export function AddLeadContent() {
         followup_priority: "medium",
         followup_notes: "",
         internal_notes: "",
-        client_timezone: "America/New_York", // Reset to default
+        client_timezone: "America/New_York",
       })
       setPositions([])
       setErrors({})
 
-      // Navigate to leads page
       router.push("/leads")
     } catch (error) {
       console.error("Error saving lead:", error)
@@ -402,29 +393,22 @@ export function AddLeadContent() {
                     onChange={(e) => handleInputChange("credit_score", Number.parseInt(e.target.value) || 0)}
                   />
                 </div>
+                {/* Updated Client Location/Timezone Selector */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Client Timezone</Label>
-                  <Select
+                  <TimezoneSelector
                     value={formData.client_timezone}
-                    onValueChange={(value) => handleInputChange("client_timezone", value)}
-                  >
-                    <SelectTrigger className="glow-input">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="America/New_York">Eastern Time (New York)</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time (Chicago)</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time (Denver)</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time (Los Angeles)</SelectItem>
-                      <SelectItem value="America/Phoenix">Arizona Time (Phoenix)</SelectItem>
-                      <SelectItem value="America/Anchorage">Alaska Time (Anchorage)</SelectItem>
-                      <SelectItem value="Pacific/Honolulu">Hawaii Time (Honolulu)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
+                    label="Client Location"
+                    placeholder="Select client's location..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This helps schedule follow-ups at appropriate local times
+                  </p>
                 </div>
               </div>
             </Card>
 
+            {/* Rest of the form sections continue unchanged... */}
             {/* Funding Requirements */}
             <Card className="glow-card p-6">
               <h3 className="text-lg font-bold text-white mb-4">
@@ -496,7 +480,6 @@ export function AddLeadContent() {
                   Add Position
                 </Button>
               </div>
-
               <div className="space-y-4">
                 {positions.length > 0 && (
                   <div className="space-y-4">
@@ -523,9 +506,6 @@ export function AddLeadContent() {
                               placeholder="Enter lender name"
                               className={`glow-input ${errors[`position_${index}_lender`] ? "border-red-300" : ""}`}
                             />
-                            {errors[`position_${index}_lender`] && (
-                              <p className="text-sm text-red-400">{errors[`position_${index}_lender`]}</p>
-                            )}
                           </div>
                           <div className="space-y-2">
                             <Label className="text-sm font-semibold text-white">Payment Frequency</Label>
@@ -560,9 +540,6 @@ export function AddLeadContent() {
                               placeholder="0"
                               className={`glow-input ${errors[`position_${index}_original`] ? "border-red-300" : ""}`}
                             />
-                            {errors[`position_${index}_original`] && (
-                              <p className="text-sm text-red-400">{errors[`position_${index}_original`]}</p>
-                            )}
                           </div>
                           <div className="space-y-2">
                             <Label className="text-sm font-semibold text-white">Current Balance Remaining</Label>
@@ -575,14 +552,10 @@ export function AddLeadContent() {
                               placeholder="0"
                               className={`glow-input ${errors[`position_${index}_balance`] ? "border-red-300" : ""}`}
                             />
-                            {errors[`position_${index}_balance`] && (
-                              <p className="text-sm text-red-400">{errors[`position_${index}_balance`]}</p>
-                            )}
                           </div>
                         </div>
                       </div>
                     ))}
-
                     {positions.length > 0 && (
                       <div className="mt-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
                         <div className="text-sm text-blue-300">
@@ -621,7 +594,6 @@ export function AddLeadContent() {
                     </div>
                   </RadioGroup>
                 </div>
-
                 {formData.has_mca_history && (
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold text-white">Has Defaults?</Label>
@@ -644,7 +616,6 @@ export function AddLeadContent() {
                     </RadioGroup>
                   </div>
                 )}
-
                 {formData.has_mca_history && formData.has_defaults && (
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold text-white">Default Details</Label>
@@ -748,8 +719,8 @@ export function AddLeadContent() {
                   onClick={() => {
                     const tomorrow = new Date()
                     tomorrow.setDate(tomorrow.getDate() + 1)
-                    tomorrow.setHours(9, 0, 0, 0) // Set to 9:00 AM
-                    const isoString = tomorrow.toISOString().slice(0, 16) // Format for datetime-local
+                    tomorrow.setHours(9, 0, 0, 0)
+                    const isoString = tomorrow.toISOString().slice(0, 16)
                     handleInputChange("next_followup", isoString)
                   }}
                 >
