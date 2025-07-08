@@ -269,10 +269,10 @@ export function DashboardContent() {
                   <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Contact Info
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Stage
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -349,21 +349,25 @@ export function DashboardContent() {
 
                       {/* Stage */}
                       <td className="py-3 px-4">
-                        <Badge className={`${getStageColor(lead.stage)} border font-medium`}>{lead.stage}</Badge>
+                        <div className="flex justify-center">
+                          <Badge className={`${getStageColor(lead.stage)} border font-medium text-center`}>{lead.stage}</Badge>
+                        </div>
                       </td>
 
                       {/* Actions */}
                       <td className="py-3 px-4">
-                        <Button
-                          size="sm"
-                          className="glow-button text-white font-semibold text-xs px-3 py-1"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            router.push(`/leads/${lead.id}`)
-                          }}
-                        >
-                          View
-                        </Button>
+                        <div className="flex justify-center">
+                          <Button
+                            size="sm"
+                            className="glow-button text-white font-semibold text-xs px-3 py-1"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              router.push(`/leads/${lead.id}`)
+                            }}
+                          >
+                            View
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   )

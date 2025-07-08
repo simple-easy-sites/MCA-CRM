@@ -24,7 +24,7 @@ interface EditLeadContentProps {
 
 export function EditLeadContent({ leadId }: EditLeadContentProps) {
   const router = useRouter()
-  const { getLeadById, updateLead, deleteLead } = useLeads()
+  const { getLeadById, updateLead, deleteLead, refreshLeads } = useLeads()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -149,19 +149,24 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
       }
 
       console.log('🔄 Edit Lead: Updating follow-up to:', nextFollowup)
+      console.log('📝 Edit Lead: Form data:', formData)
+      console.log('👤 Edit Lead: Original lead:', lead)
 
       const updatedLead: Lead = {
-        ...lead,
+        id: lead.id,
         business_name: formData.business_name,
         owner_name: formData.owner_name,
         phone: formData.phone,
         email: formData.email,
         business_type: formData.business_type,
+        business_type_details: lead.business_type_details,
+        credit_score: lead.credit_score,
         funding_amount: formData.funding_amount,
         monthly_revenue: formData.monthly_revenue,
         funding_purpose: formData.funding_purpose,
         payback_time: formData.payback_time,
         has_mca_history: formData.has_mca_history,
+        has_defaults: lead.has_defaults,
         default_details: formData.default_details,
         stage: formData.stage,
         next_followup: nextFollowup,
@@ -169,17 +174,21 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         followup_notes: formData.followup_notes,
         internal_notes: formData.internal_notes,
         current_positions: positions,
+        created_at: lead.created_at,
         updated_at: new Date().toISOString(),
       }
 
-      updateLead(updatedLead)
+      await updateLead(updatedLead)
 
       toast({
         title: "Success!",
         description: "Lead has been updated successfully.",
       })
 
+      // Refresh leads data and navigate back to lead detail
+      await refreshLeads()
       router.push(`/leads/${leadId}`)
+      
     } catch (error) {
       console.error('❌ Error updating lead:', error)
       toast({

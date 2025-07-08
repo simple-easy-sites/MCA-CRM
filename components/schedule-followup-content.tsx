@@ -76,33 +76,67 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
         return
       }
 
-      // Combine date and time into proper datetime format
+      // Validate date is not in the past
+      const selectedDate = new Date(`${formData.followup_date}T${formData.followup_time}:00`)
+      const now = new Date()
+      if (selectedDate < now) {
+        toast({
+          title: "Validation Error",
+          description: "Follow-up date cannot be in the past.",
+          variant: "destructive",
+        })
+        setLoading(false)
+        return
+      }
+
+      // Combine date and time into proper datetime format  
       const dateTimeString = `${formData.followup_date}T${formData.followup_time}:00`
       
       console.log('📅 Scheduling follow-up for:', dateTimeString)
       console.log('📋 Form data:', formData)
       console.log('👤 Lead data:', lead)
 
+      // Create a clean copy of the lead with only the fields that should be updated
       const updatedLead = {
-        ...lead,
+        id: lead.id,
+        business_name: lead.business_name,
+        owner_name: lead.owner_name,
+        phone: lead.phone,
+        email: lead.email,
+        business_type: lead.business_type,
+        business_type_details: lead.business_type_details,
+        credit_score: lead.credit_score,
+        funding_amount: lead.funding_amount,
+        monthly_revenue: lead.monthly_revenue,
+        funding_purpose: lead.funding_purpose,
+        payback_time: lead.payback_time,
+        has_mca_history: lead.has_mca_history,
+        has_defaults: lead.has_defaults,
+        default_details: lead.default_details,
+        stage: lead.stage,
         next_followup: dateTimeString,
         followup_priority: formData.priority as "low" | "medium" | "high" | "urgent",
         followup_notes: formData.notes,
         internal_notes: lead.internal_notes
           ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`
           : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`,
+        current_positions: lead.current_positions || [],
+        created_at: lead.created_at,
         updated_at: new Date().toISOString(),
       }
 
       console.log('🔄 Updating lead with:', updatedLead)
       await updateLead(updatedLead)
-
+      
+      console.log('✅ Follow-up scheduled successfully!')
       toast({
         title: "Follow-up Scheduled!",
         description: `Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()}`,
       })
 
+      // Navigate back immediately
       router.push(`/leads/${leadId}`)
+      
     } catch (error) {
       console.error('❌ Error scheduling follow-up:', error)
       toast({

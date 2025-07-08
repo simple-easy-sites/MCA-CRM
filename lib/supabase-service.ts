@@ -169,18 +169,52 @@ export const leadService = {
   // Update an existing lead
   async updateLead(lead: Lead): Promise<Lead> {
     try {
-      // Separate positions from lead data
-      const { current_positions, ...leadWithoutPositions } = lead
+      console.log('🔄 Supabase: Updating lead with data:', lead)
+      
+      // Separate positions from lead data and remove read-only fields
+      const { current_positions, created_at, updated_at, ...leadWithoutPositions } = lead
+
+      // Clean up the data - convert empty strings to null for database
+      // Don't include id in the update data since it's the primary key
+      const cleanedLeadData = {
+        business_name: leadWithoutPositions.business_name,
+        owner_name: leadWithoutPositions.owner_name,
+        phone: leadWithoutPositions.phone,
+        email: leadWithoutPositions.email || null,
+        business_type: leadWithoutPositions.business_type || null,
+        business_type_details: leadWithoutPositions.business_type_details || null,
+        credit_score: leadWithoutPositions.credit_score || null,
+        funding_amount: leadWithoutPositions.funding_amount || null,
+        monthly_revenue: leadWithoutPositions.monthly_revenue || null,
+        funding_purpose: leadWithoutPositions.funding_purpose || null,
+        payback_time: leadWithoutPositions.payback_time || null,
+        has_mca_history: leadWithoutPositions.has_mca_history || false,
+        has_defaults: leadWithoutPositions.has_defaults || false,
+        default_details: leadWithoutPositions.default_details || null,
+        stage: leadWithoutPositions.stage,
+        next_followup: leadWithoutPositions.next_followup || null,
+        followup_priority: leadWithoutPositions.followup_priority || null,
+        followup_notes: leadWithoutPositions.followup_notes || null,
+        internal_notes: leadWithoutPositions.internal_notes || null,
+        updated_at: new Date().toISOString()
+      }
+      
+      console.log('📊 Cleaned data for update:', cleanedLeadData)
 
       // Update the lead
       const { data: updatedLead, error: leadError } = await supabase
         .from('leads')
-        .update(leadWithoutPositions)
+        .update(cleanedLeadData)
         .eq('id', lead.id)
         .select()
         .single()
 
-      if (leadError) throw leadError
+      if (leadError) {
+        console.error('❌ Supabase update error:', leadError)
+        throw leadError
+      }
+      
+      console.log('✅ Lead updated successfully:', updatedLead)
 
       // Update positions - delete existing and insert new ones
       await positionService.deletePositionsByLeadId(lead.id)
@@ -209,8 +243,8 @@ export const leadService = {
         internal_notes: updatedLead.internal_notes || ''
       }
     } catch (error) {
-      console.error('Error updating lead:', error)
-      throw new Error('Failed to update lead')
+      console.error('❌ Error updating lead:', error)
+      throw new Error(`Failed to update lead: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   },
 
