@@ -26,7 +26,7 @@ export function DashboardContent() {
 
   const totalLeads = leads.length
   
-  // Calculate follow-ups more comprehensively
+  // Calculate follow-ups more comprehensively with proper datetime handling
   const today = new Date()
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
   const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
@@ -36,7 +36,16 @@ export function DashboardContent() {
   const followUpsDue = leads.filter((lead) => {
     if (!lead.next_followup || lead.next_followup.trim() === '') return false
     try {
-      const followUpDate = new Date(lead.next_followup)
+      // FIXED: Parse datetime properly without timezone conversion
+      const isoString = lead.next_followup.includes('T') ? lead.next_followup : lead.next_followup + 'T00:00:00.000Z'
+      const datePart = isoString.split('T')[0]
+      const timePart = isoString.split('T')[1].split('.')[0]
+      
+      // Create date object from parts
+      const [year, month, day] = datePart.split('-')
+      const [hours, minutes] = timePart.split(':')
+      const followUpDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes))
+      
       if (isNaN(followUpDate.getTime())) return false // Invalid date
       console.log('📅 Lead:', lead.business_name, 'Follow-up:', followUpDate.toLocaleString(), 'Due?', followUpDate <= todayEnd)
       // Show follow-ups that are today or overdue
@@ -50,7 +59,16 @@ export function DashboardContent() {
   const upcomingFollowUps = leads.filter((lead) => {
     if (!lead.next_followup || lead.next_followup.trim() === '') return false
     try {
-      const followUpDate = new Date(lead.next_followup)
+      // FIXED: Parse datetime properly without timezone conversion
+      const isoString = lead.next_followup.includes('T') ? lead.next_followup : lead.next_followup + 'T00:00:00.000Z'
+      const datePart = isoString.split('T')[0]
+      const timePart = isoString.split('T')[1].split('.')[0]
+      
+      // Create date object from parts
+      const [year, month, day] = datePart.split('-')
+      const [hours, minutes] = timePart.split(':')
+      const followUpDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes))
+      
       if (isNaN(followUpDate.getTime())) return false // Invalid date
       const nextWeek = new Date(todayEnd)
       nextWeek.setDate(nextWeek.getDate() + 7)

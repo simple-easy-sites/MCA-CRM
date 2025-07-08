@@ -89,10 +89,18 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
         return
       }
 
-      // Combine date and time into proper datetime format  
-      const dateTimeString = `${formData.followup_date}T${formData.followup_time}:00`
+      // FIXED: Create proper ISO datetime string without timezone conversion
+      const year = formData.followup_date.split('-')[0]
+      const month = formData.followup_date.split('-')[1]
+      const day = formData.followup_date.split('-')[2]
+      const time = formData.followup_time
       
-      console.log('📅 Scheduling follow-up for:', dateTimeString)
+      // Create the datetime string exactly as entered (no timezone conversion)
+      const dateTimeString = `${year}-${month}-${day}T${time}:00.000Z`
+      
+      console.log('📅 Original input - Date:', formData.followup_date, 'Time:', formData.followup_time)
+      console.log('📅 Created datetime string:', dateTimeString)
+      console.log('📅 Verification - parsed back:', new Date(dateTimeString).toLocaleString())
       console.log('📋 Form data:', formData)
       console.log('👤 Lead data:', lead)
 
@@ -118,8 +126,8 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
         followup_priority: formData.priority as "low" | "medium" | "high" | "urgent",
         followup_notes: formData.notes,
         internal_notes: lead.internal_notes
-          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`
-          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`,
+          ? `${lead.internal_notes}\n\n[${new Date().toLocaleDateString()}] Follow-up scheduled for ${formData.followup_date} at ${formData.followup_time} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`
+          : `[${new Date().toLocaleDateString()}] Follow-up scheduled for ${formData.followup_date} at ${formData.followup_time} - ${formData.followup_type} (${formData.priority} priority) - ${formData.notes}`,
         current_positions: lead.current_positions || [],
         created_at: lead.created_at,
         updated_at: new Date().toISOString(),
@@ -131,7 +139,7 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
       console.log('✅ Follow-up scheduled successfully!')
       toast({
         title: "Follow-up Scheduled!",
-        description: `Follow-up scheduled for ${new Date(dateTimeString).toLocaleString()}`,
+        description: `Follow-up scheduled for ${formData.followup_date} at ${formData.followup_time}`,
       })
 
       // Navigate back immediately

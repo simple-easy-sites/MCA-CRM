@@ -292,23 +292,51 @@ export function FollowUpsContent() {
   }
 
   const formatDateTime = (dateTimeString: string) => {
-    const date = new Date(dateTimeString)
-    const today = new Date()
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    if (!dateTimeString) return { date: 'No date', time: '', full: '', dayName: '' }
     
-    let dateLabel = date.toLocaleDateString()
-    if (date.toDateString() === today.toDateString()) {
-      dateLabel = "Today"
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      dateLabel = "Tomorrow"
-    }
-    
-    return {
-      date: dateLabel,
-      time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      full: date.toLocaleString(),
-      dayName: date.toLocaleDateString('en-US', { weekday: 'long' })
+    try {
+      // FIXED: Parse the datetime properly to avoid timezone conversion
+      const isoString = dateTimeString.includes('T') ? dateTimeString : dateTimeString + 'T00:00:00.000Z'
+      const datePart = isoString.split('T')[0] // Gets YYYY-MM-DD
+      const timePart = isoString.split('T')[1].split('.')[0] // Gets HH:MM:SS
+      
+      // Create a date object for day name (this is safe for day names)
+      const dateForDayName = new Date(datePart + 'T12:00:00.000Z') // Use noon to avoid timezone issues
+      
+      // Format date as MM/DD/YYYY
+      const [year, month, day] = datePart.split('-')
+      const formattedDate = `${month}/${day}/${year}`
+      
+      // Format time as HH:MM AM/PM
+      const [hours, minutes] = timePart.split(':')
+      const hour24 = parseInt(hours)
+      const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24
+      const ampm = hour24 >= 12 ? 'PM' : 'AM'
+      const formattedTime = `${hour12}:${minutes} ${ampm}`
+      
+      // Check if it's today or tomorrow
+      const today = new Date()
+      const todayString = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const tomorrowString = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0')
+      
+      let dateLabel = formattedDate
+      if (datePart === todayString) {
+        dateLabel = "Today"
+      } else if (datePart === tomorrowString) {
+        dateLabel = "Tomorrow"
+      }
+      
+      return {
+        date: dateLabel,
+        time: formattedTime,
+        full: `${formattedDate} at ${formattedTime}`,
+        dayName: dateForDayName.toLocaleDateString('en-US', { weekday: 'long' })
+      }
+    } catch (error) {
+      console.error('Error formatting datetime:', error, 'Input:', dateTimeString)
+      return { date: 'Invalid date', time: '', full: 'Invalid date', dayName: '' }
     }
   }
 
@@ -680,9 +708,9 @@ export function FollowUpsContent() {
                             {statusText}
                           </Badge>
                           <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 border font-medium capitalize">
-                            {followUp.follow_up_type === 'call' ? '📞 Phone Call' : 
-                             followUp.follow_up_type === 'email' ? '📧 Email' : 
-                             followUp.follow_up_type === 'text' ? '💬 Text' : 
+                            {followUp.follow_up_type === 'call' ? 'Phone Call' : 
+                             followUp.follow_up_type === 'email' ? 'Email' : 
+                             followUp.follow_up_type === 'text' ? 'Text Message' : 
                              followUp.follow_up_type}
                           </Badge>
                         </div>

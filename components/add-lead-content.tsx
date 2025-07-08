@@ -37,6 +37,7 @@ interface FormData {
   followup_priority: "low" | "medium" | "high" | "urgent"
   followup_notes: string
   internal_notes: string
+  client_timezone: string // NEW: Client's timezone
 }
 
 interface FormErrors {
@@ -72,6 +73,7 @@ export function AddLeadContent() {
     followup_priority: "medium",
     followup_notes: "",
     internal_notes: "",
+    client_timezone: "America/New_York", // Default to Eastern Time
   })
 
   // Auto-focus first field
@@ -239,6 +241,7 @@ export function AddLeadContent() {
         followup_priority: "medium",
         followup_notes: "",
         internal_notes: "",
+        client_timezone: "America/New_York", // Reset to default
       })
       setPositions([])
       setErrors({})
@@ -398,6 +401,26 @@ export function AddLeadContent() {
                     value={formData.credit_score || ""}
                     onChange={(e) => handleInputChange("credit_score", Number.parseInt(e.target.value) || 0)}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-white">Client Timezone</Label>
+                  <Select
+                    value={formData.client_timezone}
+                    onValueChange={(value) => handleInputChange("client_timezone", value)}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="America/New_York">Eastern Time (New York)</SelectItem>
+                      <SelectItem value="America/Chicago">Central Time (Chicago)</SelectItem>
+                      <SelectItem value="America/Denver">Mountain Time (Denver)</SelectItem>
+                      <SelectItem value="America/Los_Angeles">Pacific Time (Los Angeles)</SelectItem>
+                      <SelectItem value="America/Phoenix">Arizona Time (Phoenix)</SelectItem>
+                      <SelectItem value="America/Anchorage">Alaska Time (Anchorage)</SelectItem>
+                      <SelectItem value="Pacific/Honolulu">Hawaii Time (Honolulu)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </Card>

@@ -50,21 +50,30 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     followup_priority: "medium",
     followup_notes: "",
     internal_notes: "",
+    client_timezone: "America/New_York", // NEW: Client timezone
   })
 
   useEffect(() => {
     if (lead) {
-      // Split next_followup into date and time components
+      // FIXED: Split next_followup into date and time components properly
       let followupDate = ""
       let followupTime = "09:00"
       
       if (lead.next_followup && lead.next_followup.trim() !== "") {
         try {
-          const followupDateTime = new Date(lead.next_followup)
-          if (!isNaN(followupDateTime.getTime())) {
-            followupDate = followupDateTime.toISOString().split('T')[0]
-            followupTime = followupDateTime.toTimeString().slice(0, 5)
-          }
+          // Parse the ISO string directly to avoid timezone conversion
+          const isoString = lead.next_followup.includes('T') ? lead.next_followup : lead.next_followup + 'T00:00:00.000Z'
+          const datePart = isoString.split('T')[0] // Gets YYYY-MM-DD
+          const timePart = isoString.split('T')[1].split('.')[0] // Gets HH:MM:SS
+          
+          followupDate = datePart // YYYY-MM-DD format for date input
+          followupTime = timePart.substring(0, 5) // HH:MM format for time input
+          
+          console.log('📅 Edit Lead: Parsing follow-up:', {
+            original: lead.next_followup,
+            parsed_date: followupDate,
+            parsed_time: followupTime
+          })
         } catch (error) {
           console.error('Error parsing follow-up date:', error)
         }
@@ -88,6 +97,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         followup_priority: lead.followup_priority || "medium",
         followup_notes: lead.followup_notes || "",
         internal_notes: lead.internal_notes,
+        client_timezone: lead.client_timezone || "America/New_York",
       })
       setPositions(lead.current_positions)
     }
@@ -142,13 +152,24 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Combine date and time into proper datetime format
+      // FIXED: Combine date and time into proper datetime format without timezone conversion
       let nextFollowup = ""
       if (formData.next_followup_date) {
-        nextFollowup = `${formData.next_followup_date}T${formData.next_followup_time}:00`
+        const year = formData.next_followup_date.split('-')[0]
+        const month = formData.next_followup_date.split('-')[1]
+        const day = formData.next_followup_date.split('-')[2]
+        const time = formData.next_followup_time
+        
+        // Create the datetime string exactly as entered (no timezone conversion)
+        nextFollowup = `${year}-${month}-${day}T${time}:00.000Z`
+        
+        console.log('🔄 Edit Lead: Creating follow-up datetime:', {
+          date_input: formData.next_followup_date,
+          time_input: formData.next_followup_time,
+          combined: nextFollowup
+        })
       }
 
-      console.log('🔄 Edit Lead: Updating follow-up to:', nextFollowup)
       console.log('📝 Edit Lead: Form data:', formData)
       console.log('👤 Edit Lead: Original lead:', lead)
 
@@ -176,6 +197,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         current_positions: positions,
         created_at: lead.created_at,
         updated_at: new Date().toISOString(),
+        client_timezone: formData.client_timezone,
       }
 
       await updateLead(updatedLead)
@@ -329,6 +351,26 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                     value={formData.business_type}
                     onChange={(e) => handleInputChange("business_type", e.target.value)}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-white">Client Timezone</Label>
+                  <Select
+                    value={formData.client_timezone}
+                    onValueChange={(value) => handleInputChange("client_timezone", value)}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="America/New_York">Eastern Time (New York)</SelectItem>
+                      <SelectItem value="America/Chicago">Central Time (Chicago)</SelectItem>
+                      <SelectItem value="America/Denver">Mountain Time (Denver)</SelectItem>
+                      <SelectItem value="America/Los_Angeles">Pacific Time (Los Angeles)</SelectItem>
+                      <SelectItem value="America/Phoenix">Arizona Time (Phoenix)</SelectItem>
+                      <SelectItem value="America/Anchorage">Alaska Time (Anchorage)</SelectItem>
+                      <SelectItem value="Pacific/Honolulu">Hawaii Time (Honolulu)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </Card>

@@ -9,6 +9,7 @@ import { useLeads } from "@/contexts/lead-context"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { formatCurrency, formatPhoneNumber } from "@/lib/format-utils"
+import { formatDateTimeInTimezone, getCurrentTimeInTimezone } from "@/lib/timezone-utils"
 
 interface LeadDetailContentProps {
   leadId: string
@@ -42,13 +43,14 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "Not scheduled"
-    try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return "Invalid date"
-      return date.toLocaleDateString() + " at " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    } catch (error) {
-      return "Invalid date"
+    
+    const timezoneInfo = formatDateTimeInTimezone(dateString, lead?.client_timezone)
+    
+    if (timezoneInfo.clientTime) {
+      return `${timezoneInfo.date} at ${timezoneInfo.clientTime}`
     }
+    
+    return timezoneInfo.date
   }
 
   const getStageColor = (stage: string) => {
@@ -405,6 +407,18 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Business Details</label>
                 <p className="text-white font-medium mt-1">{lead.business_type_details || "Not specified"}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Client Timezone</label>
+                <p className="text-white font-medium mt-1">
+                  {lead.client_timezone ? 
+                    `${lead.client_timezone.split('/')[1].replace('_', ' ')} Time` : 
+                    'Eastern Time'
+                  }
+                </p>
+                <p className="text-sm text-blue-400 mt-1">
+                  Current time: {getCurrentTimeInTimezone(lead.client_timezone)}
+                </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Credit Score</label>

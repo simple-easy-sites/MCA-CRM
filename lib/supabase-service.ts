@@ -41,7 +41,9 @@ export const leadService = {
         next_followup: lead.next_followup || '',
         followup_priority: lead.followup_priority || 'medium',
         followup_notes: lead.followup_notes || '',
-        internal_notes: lead.internal_notes || ''
+        internal_notes: lead.internal_notes || '',
+        client_timezone: lead.client_timezone || 'America/New_York',
+        client_timezone: lead.client_timezone || 'America/New_York'
       }))
     } catch (error) {
       console.error('Error fetching leads:', error)
@@ -113,7 +115,8 @@ export const leadService = {
         next_followup: leadWithoutPositions.next_followup || null, // This fixes the date error!
         followup_priority: leadWithoutPositions.followup_priority || null,
         followup_notes: leadWithoutPositions.followup_notes || null,
-        internal_notes: leadWithoutPositions.internal_notes || null
+        internal_notes: leadWithoutPositions.internal_notes || null,
+        client_timezone: leadWithoutPositions.client_timezone || 'America/New_York'
       }
       
       console.log('📊 Cleaned lead data:', cleanedLeadData)
@@ -158,7 +161,8 @@ export const leadService = {
         next_followup: newLead.next_followup || '',
         followup_priority: newLead.followup_priority || 'medium',
         followup_notes: newLead.followup_notes || '',
-        internal_notes: newLead.internal_notes || ''
+        internal_notes: newLead.internal_notes || '',
+        client_timezone: newLead.client_timezone || 'America/New_York' // Default to Eastern
       }
     } catch (error) {
       console.error('Error creating lead:', error)
@@ -196,6 +200,7 @@ export const leadService = {
         followup_priority: leadWithoutPositions.followup_priority || null,
         followup_notes: leadWithoutPositions.followup_notes || null,
         internal_notes: leadWithoutPositions.internal_notes || null,
+        client_timezone: leadWithoutPositions.client_timezone || 'America/New_York',
         updated_at: new Date().toISOString()
       }
       
@@ -240,7 +245,8 @@ export const leadService = {
         next_followup: updatedLead.next_followup || '',
         followup_priority: updatedLead.followup_priority || 'medium',
         followup_notes: updatedLead.followup_notes || '',
-        internal_notes: updatedLead.internal_notes || ''
+        internal_notes: updatedLead.internal_notes || '',
+        client_timezone: updatedLead.client_timezone || 'America/New_York'
       }
     } catch (error) {
       console.error('❌ Error updating lead:', error)
