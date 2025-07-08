@@ -79,24 +79,33 @@ export function FollowUpsContent() {
 
   // Convert leads with follow-ups to follow-up objects
   const followUps: FollowUp[] = leads
-    .filter(lead => lead.next_followup)
-    .map(lead => ({
-      id: `lead-${lead.id}`,
-      lead_id: lead.id,
-      scheduled_for: lead.next_followup,
-      follow_up_type: "call",
-      subject: `Follow up with ${lead.business_name}`,
-      notes: lead.followup_notes || "",
-      priority: (lead.followup_priority || "medium") as "low" | "medium" | "high" | "urgent",
-      completed: false,
-      lead: {
-        business_name: lead.business_name,
-        owner_name: lead.owner_name,
-        phone: lead.phone,
-        email: lead.email || "",
-        stage: lead.stage
+    .filter(lead => lead.next_followup && lead.next_followup.trim() !== '')
+    .map(lead => {
+      // Extract follow-up type from internal notes or default to 'call'
+      let followUpType = 'call'
+      if (lead.internal_notes && lead.internal_notes.includes('scheduled')) {
+        if (lead.internal_notes.toLowerCase().includes('email')) followUpType = 'email'
+        if (lead.internal_notes.toLowerCase().includes('text')) followUpType = 'text'
       }
-    }))
+      
+      return {
+        id: `lead-${lead.id}`,
+        lead_id: lead.id,
+        scheduled_for: lead.next_followup,
+        follow_up_type: followUpType,
+        subject: `Follow up with ${lead.business_name}`,
+        notes: lead.followup_notes || '',
+        priority: (lead.followup_priority || 'medium') as 'low' | 'medium' | 'high' | 'urgent',
+        completed: false,
+        lead: {
+          business_name: lead.business_name,
+          owner_name: lead.owner_name,
+          phone: lead.phone,
+          email: lead.email || '',
+          stage: lead.stage
+        }
+      }
+    })
 
   // Filter follow-ups
   const filteredFollowUps = followUps.filter(followUp => {
@@ -414,8 +423,7 @@ export function FollowUpsContent() {
                     <SelectContent>
                       <SelectItem value="call">Phone Call</SelectItem>
                       <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="meeting">Meeting</SelectItem>
-                      <SelectItem value="note">Note/Reminder</SelectItem>
+                      <SelectItem value="text">Text Message</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -670,6 +678,12 @@ export function FollowUpsContent() {
                           </Badge>
                           <Badge className={`${statusColor} border font-medium`}>
                             {statusText}
+                          </Badge>
+                          <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 border font-medium capitalize">
+                            {followUp.follow_up_type === 'call' ? '📞 Phone Call' : 
+                             followUp.follow_up_type === 'email' ? '📧 Email' : 
+                             followUp.follow_up_type === 'text' ? '💬 Text' : 
+                             followUp.follow_up_type}
                           </Badge>
                         </div>
                         

@@ -265,8 +265,7 @@ export function ScheduleFollowupContent({ leadId }: ScheduleFollowupContentProps
                     <SelectContent>
                       <SelectItem value="call">Phone Call</SelectItem>
                       <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="meeting">In-Person Meeting</SelectItem>
-                      <SelectItem value="check-in">General Check-in</SelectItem>
+                      <SelectItem value="text">Text Message</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -42,7 +42,13 @@ export function LeadDetailContent({ leadId }: LeadDetailContentProps) {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "Not scheduled"
-    return new Date(dateString).toLocaleDateString()
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return "Invalid date"
+      return date.toLocaleDateString() + " at " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    } catch (error) {
+      return "Invalid date"
+    }
   }
 
   const getStageColor = (stage: string) => {
