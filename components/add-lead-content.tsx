@@ -363,6 +363,18 @@ export function AddLeadContent() {
                   />
                   {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
                 </div>
+                {/* Updated Client Location/Timezone Selector - moved higher for better UX */}
+                <div className="space-y-2">
+                  <TimezoneSelector
+                    value={formData.client_timezone}
+                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
+                    label="Client Location"
+                    placeholder="Select client's location..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This helps schedule follow-ups at appropriate local times
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold text-white">Business Type</Label>
                   <Input
@@ -392,18 +404,6 @@ export function AddLeadContent() {
                     value={formData.credit_score || ""}
                     onChange={(e) => handleInputChange("credit_score", Number.parseInt(e.target.value) || 0)}
                   />
-                </div>
-                {/* Updated Client Location/Timezone Selector */}
-                <div className="space-y-2">
-                  <TimezoneSelector
-                    value={formData.client_timezone}
-                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
-                    label="Client Location"
-                    placeholder="Select client's location..."
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This helps schedule follow-ups at appropriate local times
-                  </p>
                 </div>
               </div>
             </Card>

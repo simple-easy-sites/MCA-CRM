@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
+import { TimezoneSelector } from "@/components/timezone-selector"
 import { ArrowLeft, Save, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -353,24 +354,15 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Client Timezone</Label>
-                  <Select
+                  <TimezoneSelector
                     value={formData.client_timezone}
-                    onValueChange={(value) => handleInputChange("client_timezone", value)}
-                  >
-                    <SelectTrigger className="glow-input">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="America/New_York">Eastern Time (New York)</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time (Chicago)</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time (Denver)</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time (Los Angeles)</SelectItem>
-                      <SelectItem value="America/Phoenix">Arizona Time (Phoenix)</SelectItem>
-                      <SelectItem value="America/Anchorage">Alaska Time (Anchorage)</SelectItem>
-                      <SelectItem value="Pacific/Honolulu">Hawaii Time (Honolulu)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
+                    label="Client Location"
+                    placeholder="Select client's location..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This helps schedule follow-ups at appropriate local times
+                  </p>
                 </div>
               </div>
             </Card>

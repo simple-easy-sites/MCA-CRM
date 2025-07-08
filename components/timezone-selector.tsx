@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ChevronDown, Clock, MapPin, Search } from 'lucide-react'
 import { TIMEZONE_OPTIONS, getCurrentTimeInTimezone, getTimezoneAbbr } from '@/lib/timezone-utils'
 import { cn } from '@/lib/utils'
@@ -22,6 +22,7 @@ export function TimezoneSelector({
 }: TimezoneSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const selectedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === value)
   
@@ -37,8 +38,23 @@ export function TimezoneSelector({
     setSearchTerm('')
   }
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+        setSearchTerm('')
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       {label && (
         <label className="block text-sm font-medium text-white mb-2">
           {label} {required && <span className="text-red-400">*</span>}
@@ -87,7 +103,7 @@ export function TimezoneSelector({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full glass-panel border border-white/10 rounded-lg shadow-xl max-h-80 overflow-hidden">
+        <div className="absolute z-[9999] mt-2 w-full glass-panel border border-white/10 rounded-lg shadow-xl max-h-80 overflow-hidden">
           {/* Search Box */}
           <div className="p-3 border-b border-white/10">
             <div className="relative">
