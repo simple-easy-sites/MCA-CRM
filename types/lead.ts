@@ -36,9 +36,7 @@ export interface Lead {
   followup_priority: "low" | "medium" | "high" | "urgent"
   followup_notes: string
   internal_notes: string
-  client_timezone: string // Client's timezone (e.g., "America/New_York")
-  client_city?: string // Client's city
-  client_state?: string // Client's state code (e.g., "FL")
+  client_timezone: string
   created_at: string
   updated_at: string
 }

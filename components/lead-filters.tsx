@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Slider } from "@/components/ui/slider"
 import { Filter, X } from "lucide-react"
-import { BUSINESS_TYPES } from "@/lib/business-types"
+import { BUSINESS_CATEGORIES } from "@/lib/business-types"
 import { US_STATES } from "@/lib/us-states"
 
 export interface LeadFilters {
@@ -18,7 +18,6 @@ export interface LeadFilters {
   monthlyRevenueMax: number
   businessType: string
   stage: string
-  state: string
   hasMcaHistory: string
   creditScoreMin: number
   creditScoreMax: number
@@ -225,10 +224,10 @@ export function LeadFiltersComponent({
                 <SelectValue placeholder="All business types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All business types</SelectItem>
-                {BUSINESS_TYPES.map(type => (
-                  <SelectItem key={type} value={type}>{type}</SelectItem>
-                ))}
+              <SelectItem value="">All business types</SelectItem>
+              {BUSINESS_CATEGORIES.map(type => (
+              <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
               </SelectContent>
             </Select>
           </div>
@@ -244,24 +243,6 @@ export function LeadFiltersComponent({
                 <SelectItem value="">All stages</SelectItem>
                 {LEAD_STAGES.map(stage => (
                   <SelectItem key={stage} value={stage}>{stage}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* State */}
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-white">State</Label>
-            <Select value={filters.state} onValueChange={(value) => updateFilter('state', value)}>
-              <SelectTrigger className="glow-input">
-                <SelectValue placeholder="All states" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All states</SelectItem>
-                {US_STATES.map(state => (
-                  <SelectItem key={state.code} value={state.code}>
-                    {state.name} ({state.code})
-                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

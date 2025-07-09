@@ -22,7 +22,6 @@ export function LeadsContent() {
     monthlyRevenueMax: 500000,
     businessType: "",
     stage: "",
-    state: "",
     hasMcaHistory: "",
     creditScoreMin: 300,
     creditScoreMax: 850,
@@ -64,11 +63,6 @@ export function LeadsContent() {
       return false
     }
 
-    // State filter
-    if (filters.state && lead.client_state !== filters.state) {
-      return false
-    }
-
     // Payback time filter
     if (filters.paybackTime && lead.payback_time !== filters.paybackTime) {
       return false
@@ -93,7 +87,6 @@ export function LeadsContent() {
       monthlyRevenueMax: 500000,
       businessType: "",
       stage: "",
-      state: "",
       hasMcaHistory: "",
       creditScoreMin: 300,
       creditScoreMax: 850,

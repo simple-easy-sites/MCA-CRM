@@ -23,6 +23,7 @@ export interface Database {
           followup_priority: string | null
           followup_notes: string | null
           internal_notes: string | null
+          client_timezone: string | null
           created_at: string
           updated_at: string
         }
@@ -47,6 +48,7 @@ export interface Database {
           followup_priority?: string | null
           followup_notes?: string | null
           internal_notes?: string | null
+          client_timezone?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -71,6 +73,7 @@ export interface Database {
           followup_priority?: string | null
           followup_notes?: string | null
           internal_notes?: string | null
+          client_timezone?: string | null
           created_at?: string
           updated_at?: string
         }

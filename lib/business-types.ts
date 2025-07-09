@@ -1,196 +1,154 @@
-// Common business types for MCA applications
-export const BUSINESS_TYPES = [
-  // Food & Beverage
-  "Restaurant",
-  "Fast Food",
-  "Café/Coffee Shop", 
-  "Bar/Tavern",
-  "Catering Service",
-  "Food Truck",
-  "Bakery",
-  "Pizza Shop",
-  
-  // Retail
-  "Retail Store",
-  "Convenience Store",
-  "Grocery Store",
-  "Clothing Store",
-  "Electronics Store",
-  "Auto Parts Store",
-  "Jewelry Store",
-  "Sporting Goods",
-  "Beauty Supply",
-  "Pet Store",
-  
-  // Services
-  "Auto Repair",
-  "Beauty Salon",
-  "Barber Shop",
-  "Spa/Wellness",
-  "Dry Cleaning",
-  "Laundromat",
-  "Cleaning Service",
-  "Landscaping",
-  "Pest Control",
-  "HVAC Service",
-  
-  // Healthcare
-  "Medical Practice",
-  "Dental Practice",
-  "Veterinary Clinic",
-  "Pharmacy",
-  "Physical Therapy",
-  "Chiropractic",
-  "Mental Health",
-  "Home Healthcare",
-  
-  // Professional Services
-  "Legal Services",
-  "Accounting",
-  "Real Estate",
-  "Insurance Agency",
-  "Marketing Agency",
-  "Consulting",
-  "IT Services",
-  "Web Design",
-  
-  // Construction & Trade
-  "General Contractor",
-  "Plumbing",
-  "Electrical",
-  "Roofing",
-  "Flooring",
-  "Painting",
-  "Masonry",
-  "Kitchen & Bath",
-  
-  // Transportation
-  "Trucking",
-  "Taxi/Rideshare",
-  "Auto Sales",
-  "Car Wash",
-  "Gas Station",
-  "Towing Service",
-  "Delivery Service",
-  "Moving Company",
-  
-  // Entertainment & Recreation
-  "Gym/Fitness",
-  "Entertainment Venue",
-  "Event Planning",
-  "Photography",
-  "Travel Agency",
-  "Hotel/Lodging",
-  
-  // Manufacturing & Wholesale
-  "Manufacturing",
-  "Wholesale",
-  "Distribution",
-  "Printing",
-  "Packaging",
-  
-  // Other
-  "E-commerce",
-  "Online Business",
-  "Franchise",
-  "Non-Profit",
+// IRS-style business type categories with details
+export const BUSINESS_CATEGORIES = [
+  "Arts & Entertainment",
+  "Construction", 
+  "Food & Beverage",
+  "Healthcare",
+  "Hospitality",
+  "Insurance",
+  "Professional Services",
+  "Retail",
+  "Transportation",
   "Other"
 ] as const
 
-export type BusinessType = typeof BUSINESS_TYPES[number]
+export type BusinessCategory = typeof BUSINESS_CATEGORIES[number]
 
-// Categorized business types for better organization
-export const BUSINESS_CATEGORIES = {
+// Business details by category
+export const BUSINESS_DETAILS: Record<BusinessCategory, string[]> = {
+  "Arts & Entertainment": [
+    "Movie Theater",
+    "Live Music Venue", 
+    "Art Gallery",
+    "Entertainment Center",
+    "Photography Studio",
+    "Event Planning",
+    "Dance Studio",
+    "Recording Studio"
+  ],
+  
+  "Construction": [
+    "General Contractor",
+    "Plumbing", 
+    "Electrical",
+    "Roofing",
+    "Flooring",
+    "Painting",
+    "HVAC",
+    "Masonry",
+    "Kitchen & Bath",
+    "Landscaping"
+  ],
+  
   "Food & Beverage": [
     "Restaurant",
-    "Fast Food", 
+    "Fast Food",
     "Café/Coffee Shop",
-    "Bar/Tavern",
+    "Bar/Tavern", 
     "Catering Service",
     "Food Truck",
     "Bakery",
-    "Pizza Shop"
+    "Pizza Shop",
+    "Deli/Sandwich Shop",
+    "Ice Cream Shop"
   ],
-  "Retail": [
-    "Retail Store",
-    "Convenience Store", 
-    "Grocery Store",
-    "Clothing Store",
-    "Electronics Store",
-    "Auto Parts Store",
-    "Jewelry Store",
-    "Sporting Goods",
-    "Beauty Supply",
-    "Pet Store"
-  ],
-  "Services": [
-    "Auto Repair",
-    "Beauty Salon",
-    "Barber Shop", 
-    "Spa/Wellness",
-    "Dry Cleaning",
-    "Laundromat",
-    "Cleaning Service",
-    "Landscaping",
-    "Pest Control",
-    "HVAC Service"
-  ],
+  
   "Healthcare": [
     "Medical Practice",
-    "Dental Practice",
+    "Dental Practice", 
     "Veterinary Clinic",
     "Pharmacy",
     "Physical Therapy",
     "Chiropractic",
     "Mental Health",
+    "Optometrist",
+    "Dermatology",
     "Home Healthcare"
   ],
-  "Professional": [
+  
+  "Hospitality": [
+    "Hotel/Motel",
+    "Bed & Breakfast",
+    "Resort",
+    "Vacation Rental",
+    "Event Venue",
+    "Wedding Venue",
+    "Conference Center"
+  ],
+  
+  "Insurance": [
+    "Insurance Agency",
+    "Life Insurance",
+    "Auto Insurance", 
+    "Health Insurance",
+    "Property Insurance",
+    "Business Insurance"
+  ],
+  
+  "Professional Services": [
     "Legal Services",
     "Accounting",
-    "Real Estate",
-    "Insurance Agency",
     "Marketing Agency",
     "Consulting",
     "IT Services",
-    "Web Design"
+    "Web Design",
+    "Financial Services",
+    "Business Services",
+    "Real Estate Agency",
+    "Property Management"
   ],
-  "Construction": [
-    "General Contractor",
-    "Plumbing",
-    "Electrical",
-    "Roofing",
-    "Flooring",
-    "Painting",
-    "Masonry",
-    "Kitchen & Bath"
+  
+  "Retail": [
+    "Clothing Store",
+    "Electronics Store",
+    "Grocery Store",
+    "Convenience Store",
+    "Auto Parts Store",
+    "Jewelry Store",
+    "Sporting Goods",
+    "Beauty Supply",
+    "Pet Store",
+    "Liquor Store",
+    "Hardware Store",
+    "Furniture Store"
   ],
+  
   "Transportation": [
     "Trucking",
     "Taxi/Rideshare",
     "Auto Sales",
-    "Car Wash",
+    "Car Wash", 
     "Gas Station",
     "Towing Service",
     "Delivery Service",
-    "Moving Company"
+    "Moving Company",
+    "Auto Repair"
   ],
+  
   "Other": [
-    "Gym/Fitness",
-    "Entertainment Venue",
-    "Event Planning",
-    "Photography",
-    "Travel Agency",
-    "Hotel/Lodging",
     "Manufacturing",
-    "Wholesale",
-    "Distribution",
-    "Printing",
-    "Packaging",
-    "E-commerce",
-    "Online Business",
+    "Technology/Software",
+    "Gym/Fitness",
+    "Beauty Salon",
+    "Barber Shop",
+    "Spa/Wellness",
+    "Dry Cleaning",
+    "Laundromat",
+    "Cleaning Service",
+    "Pest Control",
+    "Travel Agency",
     "Franchise",
     "Non-Profit",
     "Other"
   ]
+}
+
+// Get all details for a specific category
+export function getBusinessDetails(category: BusinessCategory): string[] {
+  return BUSINESS_DETAILS[category] || []
+}
+
+// Get all categories as array
+export function getAllCategories(): BusinessCategory[] {
+  return [...BUSINESS_CATEGORIES]
 }

@@ -12,8 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
 import { TimezoneSelector } from "@/components/timezone-selector"
-import { BUSINESS_TYPES } from "@/lib/business-types"
-import { US_STATES, getTimezoneByState } from "@/lib/us-states"
+import { BUSINESS_CATEGORIES, BUSINESS_DETAILS, type BusinessCategory } from "@/lib/business-types"
 import { ArrowLeft, Save, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -41,6 +40,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     phone: "",
     email: "",
     business_type: "",
+    business_type_details: "",
     funding_amount: 0,
     monthly_revenue: 0,
     funding_purpose: "",
@@ -53,9 +53,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     followup_priority: "medium",
     followup_notes: "",
     internal_notes: "",
-    client_timezone: "America/New_York", // Client timezone
-    client_city: "", // Client city
-    client_state: "", // Client state
+    client_timezone: "America/New_York",
   })
 
   useEffect(() => {
@@ -90,6 +88,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         phone: lead.phone,
         email: lead.email,
         business_type: lead.business_type,
+        business_type_details: lead.business_type_details || "",
         funding_amount: lead.funding_amount,
         monthly_revenue: lead.monthly_revenue,
         funding_purpose: lead.funding_purpose,
@@ -103,8 +102,6 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         followup_notes: lead.followup_notes || "",
         internal_notes: lead.internal_notes,
         client_timezone: lead.client_timezone || "America/New_York",
-        client_city: lead.client_city || "",
-        client_state: lead.client_state || "",
       })
       setPositions(lead.current_positions)
     }
@@ -187,7 +184,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         phone: formData.phone,
         email: formData.email,
         business_type: formData.business_type,
-        business_type_details: lead.business_type_details,
+        business_type_details: formData.business_type_details,
         credit_score: lead.credit_score,
         funding_amount: formData.funding_amount,
         monthly_revenue: formData.monthly_revenue,
@@ -350,59 +347,44 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                     onChange={(e) => handleInputChange("email", e.target.value)}
                   />
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <Label className="text-sm font-semibold text-white">Business Type</Label>
                   <Select 
                     value={formData.business_type} 
-                    onValueChange={(value) => handleInputChange("business_type", value)}
+                    onValueChange={(value) => {
+                      handleInputChange("business_type", value)
+                      // Clear business details when type changes
+                      handleInputChange("business_type_details", "")
+                    }}
                   >
                     <SelectTrigger className="glow-input">
                       <SelectValue placeholder="Select business type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {BUSINESS_TYPES.map(type => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      {BUSINESS_CATEGORIES.map(category => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Client City</Label>
-                  <Input
-                    placeholder="Enter city name"
-                    className="glow-input"
-                    value={formData.client_city}
-                    onChange={(e) => handleInputChange("client_city", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white">Client State</Label>
-                  <Select 
-                    value={formData.client_state} 
-                    onValueChange={(value) => {
-                      handleInputChange("client_state", value)
-                      // Automatically set timezone based on state
-                      const timezone = getTimezoneByState(value)
-                      handleInputChange("client_timezone", timezone)
-                    }}
-                  >
-                    <SelectTrigger className="glow-input">
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {US_STATES.map(state => (
-                        <SelectItem key={state.code} value={state.code}>
-                          {state.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {formData.client_state && (
-                    <p className="text-xs text-muted-foreground">
-                      Timezone: {formData.client_timezone.replace('_', ' ')}
-                    </p>
-                  )}
-                </div>
+                {formData.business_type && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white">Business Details</Label>
+                    <Select 
+                      value={formData.business_type_details} 
+                      onValueChange={(value) => handleInputChange("business_type_details", value)}
+                    >
+                      <SelectTrigger className="glow-input">
+                        <SelectValue placeholder="Select business details" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BUSINESS_DETAILS[formData.business_type as BusinessCategory]?.map(detail => (
+                          <SelectItem key={detail} value={detail}>{detail}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </Card>
 
@@ -633,6 +615,13 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                         className="glow-input min-h-[80px]"
                         value={formData.followup_notes}
                         onChange={(e) => handleInputChange("followup_notes", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-white">Client Timezone</Label>
+                      <TimezoneSelector
+                        value={formData.client_timezone}
+                        onChange={(timezone) => handleInputChange("client_timezone", timezone)}
                       />
                     </div>
                   </>
