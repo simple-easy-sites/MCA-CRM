@@ -1,27 +1,106 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Filter, Download, Phone, Mail } from "lucide-react"
+import { Plus, Search, Download, Phone, Mail } from "lucide-react"
 import { useLeads } from "@/contexts/lead-context"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 import { formatCurrencyAbbreviated, formatPhoneNumber } from "@/lib/format-utils"
+import { LeadFiltersComponent, type LeadFilters } from "@/components/lead-filters"
 
 export function LeadsContent() {
   const { leads } = useLeads()
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
+  const [filters, setFilters] = useState<LeadFilters>({
+    fundingAmountMin: 0,
+    fundingAmountMax: 1000000,
+    monthlyRevenueMin: 0,
+    monthlyRevenueMax: 500000,
+    businessType: "",
+    stage: "",
+    state: "",
+    hasMcaHistory: "",
+    creditScoreMin: 300,
+    creditScoreMax: 850,
+    paybackTime: ""
+  })
 
-  const filteredLeads = leads.filter(
-    (lead) =>
+  const filteredLeads = leads.filter((lead) => {
+    // Search filter
+    const matchesSearch = searchTerm === "" ||
       lead.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.owner_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.phone.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      lead.phone.toLowerCase().includes(searchTerm.toLowerCase())
+
+    if (!matchesSearch) return false
+
+    // Funding amount filter
+    if (lead.funding_amount < filters.fundingAmountMin || lead.funding_amount > filters.fundingAmountMax) {
+      return false
+    }
+
+    // Monthly revenue filter
+    if (lead.monthly_revenue < filters.monthlyRevenueMin || lead.monthly_revenue > filters.monthlyRevenueMax) {
+      return false
+    }
+
+    // Credit score filter
+    if (lead.credit_score && (lead.credit_score < filters.creditScoreMin || lead.credit_score > filters.creditScoreMax)) {
+      return false
+    }
+
+    // Business type filter
+    if (filters.businessType && lead.business_type !== filters.businessType) {
+      return false
+    }
+
+    // Stage filter
+    if (filters.stage && lead.stage !== filters.stage) {
+      return false
+    }
+
+    // State filter
+    if (filters.state && lead.client_state !== filters.state) {
+      return false
+    }
+
+    // Payback time filter
+    if (filters.paybackTime && lead.payback_time !== filters.paybackTime) {
+      return false
+    }
+
+    // MCA history filter
+    if (filters.hasMcaHistory === "true" && !lead.has_mca_history) {
+      return false
+    }
+    if (filters.hasMcaHistory === "false" && lead.has_mca_history) {
+      return false
+    }
+
+    return true
+  })
+
+  const clearFilters = () => {
+    setFilters({
+      fundingAmountMin: 0,
+      fundingAmountMax: 1000000,
+      monthlyRevenueMin: 0,
+      monthlyRevenueMax: 500000,
+      businessType: "",
+      stage: "",
+      state: "",
+      hasMcaHistory: "",
+      creditScoreMin: 300,
+      creditScoreMax: 850,
+      paybackTime: ""
+    })
+    setSearchTerm("")
+  }
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -102,10 +181,13 @@ export function LeadsContent() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="glow-button text-white font-semibold">
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
+            <LeadFiltersComponent
+              filters={filters}
+              onFiltersChange={setFilters}
+              onClearFilters={clearFilters}
+              totalLeads={leads.length}
+              filteredCount={filteredLeads.length}
+            />
           </div>
           <div className="text-sm text-muted-foreground">
             Showing <span className="font-medium text-white">{filteredLeads.length}</span> of{" "}
@@ -140,7 +222,7 @@ export function LeadsContent() {
                   <th className="text-left py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Stage
                   </th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="text-center py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -221,7 +303,7 @@ export function LeadsContent() {
                       </td>
 
                       {/* Actions */}
-                      <td className="py-4 px-4">
+                      <td className="py-4 px-4 text-center">
                         <Button
                           size="sm"
                           className="glow-button text-white font-semibold text-xs px-3 py-1"

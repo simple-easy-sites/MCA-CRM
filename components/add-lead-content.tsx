@@ -14,7 +14,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLeads } from "@/contexts/lead-context"
 import { useToast } from "@/hooks/use-toast"
-import { TimezoneSelector } from "@/components/timezone-selector"
+import { BUSINESS_TYPES } from "@/lib/business-types"
+import { US_STATES, getTimezoneByState } from "@/lib/us-states"
 import type { Position } from "@/types/lead"
 
 interface FormData {
@@ -39,6 +40,8 @@ interface FormData {
   followup_notes: string
   internal_notes: string
   client_timezone: string
+  client_city: string
+  client_state: string
 }
 
 interface FormErrors {
@@ -75,6 +78,8 @@ export function AddLeadContent() {
     followup_notes: "",
     internal_notes: "",
     client_timezone: "America/New_York",
+    client_city: "",
+    client_state: "",
   })
 
   // Auto-focus first field
@@ -234,6 +239,8 @@ export function AddLeadContent() {
         followup_notes: "",
         internal_notes: "",
         client_timezone: "America/New_York",
+        client_city: "",
+        client_state: "",
       })
       setPositions([])
       setErrors({})
@@ -363,26 +370,58 @@ export function AddLeadContent() {
                   />
                   {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
                 </div>
-                {/* Updated Client Location/Timezone Selector - moved higher for better UX */}
                 <div className="space-y-2">
-                  <TimezoneSelector
-                    value={formData.client_timezone}
-                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
-                    label="Client Location"
-                    placeholder="Select client's location..."
+                  <Label className="text-sm font-semibold text-white">Client City</Label>
+                  <Input
+                    placeholder="Enter city name"
+                    className="glow-input"
+                    value={formData.client_city}
+                    onChange={(e) => handleInputChange("client_city", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    This helps schedule follow-ups at appropriate local times
-                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-white">Client State</Label>
+                  <Select 
+                    value={formData.client_state} 
+                    onValueChange={(value) => {
+                      handleInputChange("client_state", value)
+                      // Automatically set timezone based on state
+                      const timezone = getTimezoneByState(value)
+                      handleInputChange("client_timezone", timezone)
+                    }}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {US_STATES.map(state => (
+                        <SelectItem key={state.code} value={state.code}>
+                          {state.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {formData.client_state && (
+                    <p className="text-xs text-muted-foreground">
+                      Timezone: {formData.client_timezone.replace('_', ' ')}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold text-white">Business Type</Label>
-                  <Input
-                    placeholder="e.g., Restaurant, Retail, Construction"
-                    className="glow-input"
-                    value={formData.business_type}
-                    onChange={(e) => handleInputChange("business_type", e.target.value)}
-                  />
+                  <Select 
+                    value={formData.business_type} 
+                    onValueChange={(value) => handleInputChange("business_type", value)}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue placeholder="Select business type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_TYPES.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold text-white">Business Type Details</Label>

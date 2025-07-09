@@ -12,6 +12,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { TimePicker, TimePickerQuick } from "@/components/ui/time-picker"
 import { TimezoneSelector } from "@/components/timezone-selector"
+import { BUSINESS_TYPES } from "@/lib/business-types"
+import { US_STATES, getTimezoneByState } from "@/lib/us-states"
 import { ArrowLeft, Save, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -51,7 +53,9 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     followup_priority: "medium",
     followup_notes: "",
     internal_notes: "",
-    client_timezone: "America/New_York", // NEW: Client timezone
+    client_timezone: "America/New_York", // Client timezone
+    client_city: "", // Client city
+    client_state: "", // Client state
   })
 
   useEffect(() => {
@@ -99,6 +103,8 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         followup_notes: lead.followup_notes || "",
         internal_notes: lead.internal_notes,
         client_timezone: lead.client_timezone || "America/New_York",
+        client_city: lead.client_city || "",
+        client_state: lead.client_state || "",
       })
       setPositions(lead.current_positions)
     }
@@ -346,23 +352,56 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label className="text-sm font-semibold text-white">Business Type</Label>
+                  <Select 
+                    value={formData.business_type} 
+                    onValueChange={(value) => handleInputChange("business_type", value)}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue placeholder="Select business type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_TYPES.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-white">Client City</Label>
                   <Input
-                    placeholder="e.g., Restaurant, Retail, Construction"
+                    placeholder="Enter city name"
                     className="glow-input"
-                    value={formData.business_type}
-                    onChange={(e) => handleInputChange("business_type", e.target.value)}
+                    value={formData.client_city}
+                    onChange={(e) => handleInputChange("client_city", e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <TimezoneSelector
-                    value={formData.client_timezone}
-                    onChange={(timezone) => handleInputChange("client_timezone", timezone)}
-                    label="Client Location"
-                    placeholder="Select client's location..."
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This helps schedule follow-ups at appropriate local times
-                  </p>
+                  <Label className="text-sm font-semibold text-white">Client State</Label>
+                  <Select 
+                    value={formData.client_state} 
+                    onValueChange={(value) => {
+                      handleInputChange("client_state", value)
+                      // Automatically set timezone based on state
+                      const timezone = getTimezoneByState(value)
+                      handleInputChange("client_timezone", timezone)
+                    }}
+                  >
+                    <SelectTrigger className="glow-input">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {US_STATES.map(state => (
+                        <SelectItem key={state.code} value={state.code}>
+                          {state.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {formData.client_state && (
+                    <p className="text-xs text-muted-foreground">
+                      Timezone: {formData.client_timezone.replace('_', ' ')}
+                    </p>
+                  )}
                 </div>
               </div>
             </Card>

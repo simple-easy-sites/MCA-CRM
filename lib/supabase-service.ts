@@ -43,7 +43,8 @@ export const leadService = {
         followup_notes: lead.followup_notes || '',
         internal_notes: lead.internal_notes || '',
         client_timezone: lead.client_timezone || 'America/New_York',
-        client_timezone: lead.client_timezone || 'America/New_York'
+        client_city: lead.client_city || '',
+        client_state: lead.client_state || ''
       }))
     } catch (error) {
       console.error('Error fetching leads:', error)
@@ -85,7 +86,10 @@ export const leadService = {
         next_followup: lead.next_followup || '',
         followup_priority: lead.followup_priority || 'medium',
         followup_notes: lead.followup_notes || '',
-        internal_notes: lead.internal_notes || ''
+        internal_notes: lead.internal_notes || '',
+        client_timezone: lead.client_timezone || 'America/New_York',
+        client_city: lead.client_city || '',
+        client_state: lead.client_state || ''
       }
     } catch (error) {
       console.error('Error fetching lead:', error)
@@ -112,11 +116,13 @@ export const leadService = {
         funding_purpose: leadWithoutPositions.funding_purpose || null,
         payback_time: leadWithoutPositions.payback_time || null,
         default_details: leadWithoutPositions.default_details || null,
-        next_followup: leadWithoutPositions.next_followup || null, // This fixes the date error!
+        next_followup: leadWithoutPositions.next_followup || null,
         followup_priority: leadWithoutPositions.followup_priority || null,
         followup_notes: leadWithoutPositions.followup_notes || null,
         internal_notes: leadWithoutPositions.internal_notes || null,
-        client_timezone: leadWithoutPositions.client_timezone || 'America/New_York'
+        client_timezone: leadWithoutPositions.client_timezone || 'America/New_York',
+        client_city: leadWithoutPositions.client_city || null,
+        client_state: leadWithoutPositions.client_state || null
       }
       
       console.log('📊 Cleaned lead data:', cleanedLeadData)
@@ -162,7 +168,9 @@ export const leadService = {
         followup_priority: newLead.followup_priority || 'medium',
         followup_notes: newLead.followup_notes || '',
         internal_notes: newLead.internal_notes || '',
-        client_timezone: newLead.client_timezone || 'America/New_York' // Default to Eastern
+        client_timezone: newLead.client_timezone || 'America/New_York',
+        client_city: newLead.client_city || '',
+        client_state: newLead.client_state || ''
       }
     } catch (error) {
       console.error('Error creating lead:', error)
@@ -201,6 +209,8 @@ export const leadService = {
         followup_notes: leadWithoutPositions.followup_notes || null,
         internal_notes: leadWithoutPositions.internal_notes || null,
         client_timezone: leadWithoutPositions.client_timezone || 'America/New_York',
+        client_city: leadWithoutPositions.client_city || null,
+        client_state: leadWithoutPositions.client_state || null,
         updated_at: new Date().toISOString()
       }
       
@@ -246,7 +256,9 @@ export const leadService = {
         followup_priority: updatedLead.followup_priority || 'medium',
         followup_notes: updatedLead.followup_notes || '',
         internal_notes: updatedLead.internal_notes || '',
-        client_timezone: updatedLead.client_timezone || 'America/New_York'
+        client_timezone: updatedLead.client_timezone || 'America/New_York',
+        client_city: updatedLead.client_city || '',
+        client_state: updatedLead.client_state || ''
       }
     } catch (error) {
       console.error('❌ Error updating lead:', error)
@@ -306,7 +318,10 @@ export const leadService = {
         next_followup: lead.next_followup || '',
         followup_priority: lead.followup_priority || 'medium',
         followup_notes: lead.followup_notes || '',
-        internal_notes: lead.internal_notes || ''
+        internal_notes: lead.internal_notes || '',
+        client_timezone: lead.client_timezone || 'America/New_York',
+        client_city: lead.client_city || '',
+        client_state: lead.client_state || ''
       }))
     } catch (error) {
       console.error('Error searching leads:', error)

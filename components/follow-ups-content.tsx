@@ -360,19 +360,11 @@ export function FollowUpsContent() {
     <div className="space-y-8 slide-in">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link href="/">
-            <Button variant="outline" size="sm" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
-          <div>
-            <h2 className="text-3xl font-bold text-white tracking-tight">
-              Follow-up <span className="gradient-text">Center</span>
-            </h2>
-            <p className="text-muted-foreground mt-1 text-lg">Manage and organize all your scheduled follow-ups</p>
-          </div>
+        <div>
+          <h2 className="text-3xl font-bold text-white tracking-tight">
+            Follow-up <span className="gradient-text">Center</span>
+          </h2>
+          <p className="text-muted-foreground mt-1 text-lg">Manage and organize all your scheduled follow-ups</p>
         </div>
         
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>

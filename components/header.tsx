@@ -64,7 +64,7 @@ const getCurrentPageInfo = (pathname: string) => {
   
   // Default fallback
   return {
-    title: 'MCA CRM',
+    title: 'Jon\'s CRM',
     breadcrumb: 'Dashboard'
   }
 }
@@ -87,7 +87,7 @@ export function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white tracking-tight">
-                MCA CRM <span className="gradient-text">Lead Management Platform</span>
+                Jon's CRM <span className="gradient-text">Lead Management Platform</span>
               </h1>
               <div className="text-xs text-muted-foreground font-medium">{pageInfo.breadcrumb}</div>
             </div>
