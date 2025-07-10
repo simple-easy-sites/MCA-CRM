@@ -182,26 +182,26 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         business_name: formData.business_name,
         owner_name: formData.owner_name,
         phone: formData.phone,
-        email: formData.email,
-        business_type: formData.business_type,
-        business_type_details: formData.business_type_details,
-        credit_score: lead.credit_score,
-        funding_amount: formData.funding_amount,
-        monthly_revenue: formData.monthly_revenue,
-        funding_purpose: formData.funding_purpose,
-        payback_time: formData.payback_time,
-        has_mca_history: formData.has_mca_history,
-        has_defaults: lead.has_defaults,
-        default_details: formData.default_details,
+        email: formData.email || '',
+        business_type: formData.business_type || '',
+        business_type_details: formData.business_type_details || '',
+        credit_score: lead.credit_score || 0,
+        funding_amount: formData.funding_amount || 0,
+        monthly_revenue: formData.monthly_revenue || 0,
+        funding_purpose: formData.funding_purpose || '',
+        payback_time: formData.payback_time || '',
+        has_mca_history: formData.has_mca_history || false,
+        has_defaults: formData.default_details && formData.default_details.trim() !== '' ? true : false,
+        default_details: formData.default_details || '',
         stage: formData.stage,
-        next_followup: nextFollowup,
+        next_followup: nextFollowup || '',
         followup_priority: formData.followup_priority as "low" | "medium" | "high" | "urgent",
-        followup_notes: formData.followup_notes,
-        internal_notes: formData.internal_notes,
+        followup_notes: formData.followup_notes || '',
+        internal_notes: formData.internal_notes || '',
         current_positions: positions,
         created_at: lead.created_at,
         updated_at: new Date().toISOString(),
-        client_timezone: formData.client_timezone,
+        client_timezone: formData.client_timezone || 'America/New_York',
       }
 
       await updateLead(updatedLead)
@@ -217,6 +217,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
       
     } catch (error) {
       console.error('❌ Error updating lead:', error)
+      console.error('❌ Lead data being sent:', updatedLead)
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to update lead. Please try again.",

@@ -212,7 +212,7 @@ export function LeadsContent() {
                   <th className="text-left py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Contact Info
                   </th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="text-center py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Stage
                   </th>
                   <th className="text-center py-4 px-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -292,7 +292,9 @@ export function LeadsContent() {
 
                       {/* Stage */}
                       <td className="py-4 px-4">
-                        <Badge className={`${getStageColor(lead.stage)} border font-medium`}>{lead.stage}</Badge>
+                        <div className="flex justify-center">
+                          <Badge className={`${getStageColor(lead.stage)} border font-medium`}>{lead.stage}</Badge>
+                        </div>
                       </td>
 
                       {/* Actions */}
