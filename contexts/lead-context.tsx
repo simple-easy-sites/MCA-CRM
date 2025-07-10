@@ -122,13 +122,23 @@ export function LeadProvider({ children }: { children: React.ReactNode }) {
 
   const updateLead = async (lead: Lead) => {
     try {
+      console.log('🔄 LeadContext: Starting update for lead:', lead.id)
+      console.log('🔄 LeadContext: Lead data:', lead)
+      
       dispatch({ type: "SET_LOADING", payload: true })
       dispatch({ type: "SET_ERROR", payload: null })
       
       const updatedLead = await leadService.updateLead(lead)
+      console.log('✅ LeadContext: Lead updated successfully:', updatedLead)
+      
       dispatch({ type: "UPDATE_LEAD", payload: updatedLead })
+      
+      // Refresh leads to ensure consistency
+      console.log('🔄 LeadContext: Refreshing leads after update')
+      await refreshLeads()
+      
     } catch (error) {
-      console.error("Error updating lead:", error)
+      console.error('❌ LeadContext: Error updating lead:', error)
       dispatch({ type: "SET_ERROR", payload: "Failed to update lead" })
       throw error
     }
