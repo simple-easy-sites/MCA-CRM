@@ -169,7 +169,10 @@ export interface Database {
           default_details: string | null
           stage: string | null
           next_followup: string | null
+          followup_priority: string | null
+          followup_notes: string | null
           internal_notes: string | null
+          client_timezone: string | null
           created_at: string | null
           updated_at: string | null
           position_count: number | null
@@ -185,7 +188,10 @@ export interface Database {
           phone: string | null
           stage: string | null
           next_followup: string | null
+          followup_priority: string | null
+          followup_notes: string | null
           internal_notes: string | null
+          client_timezone: string | null
         }
       }
     }
