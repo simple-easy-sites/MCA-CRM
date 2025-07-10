@@ -153,6 +153,8 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
     e.preventDefault()
     setLoading(true)
 
+    let updatedLead: Lead // Declare in proper scope
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -177,7 +179,7 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
       console.log('📝 Edit Lead: Form data:', formData)
       console.log('👤 Edit Lead: Original lead:', lead)
 
-      const updatedLead: Lead = {
+      updatedLead = {
         id: lead.id,
         business_name: formData.business_name,
         owner_name: formData.owner_name,
@@ -204,6 +206,8 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
         client_timezone: formData.client_timezone || 'America/New_York',
       }
 
+      console.log('🔄 Edit Lead: About to update with stage:', updatedLead.stage)
+      
       await updateLead(updatedLead)
 
       toast({
