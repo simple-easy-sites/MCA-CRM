@@ -178,32 +178,33 @@ export function EditLeadContent({ leadId }: EditLeadContentProps) {
 
       console.log('📝 Edit Lead: Form data:', formData)
       console.log('👤 Edit Lead: Original lead:', lead)
+      console.log('🎯 Edit Lead: Lead ID being updated:', lead.id)
 
       updatedLead = {
         id: lead.id,
-        business_name: formData.business_name,
-        owner_name: formData.owner_name,
-        phone: formData.phone,
-        email: formData.email || '',
-        business_type: formData.business_type || '',
-        business_type_details: formData.business_type_details || '',
+        business_name: formData.business_name.trim(),
+        owner_name: formData.owner_name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email?.trim() || '',
+        business_type: formData.business_type?.trim() || '',
+        business_type_details: formData.business_type_details?.trim() || '',
         credit_score: lead.credit_score || 0,
-        funding_amount: formData.funding_amount || 0,
-        monthly_revenue: formData.monthly_revenue || 0,
-        funding_purpose: formData.funding_purpose || '',
-        payback_time: formData.payback_time || '',
-        has_mca_history: formData.has_mca_history || false,
+        funding_amount: Number(formData.funding_amount) || 0,
+        monthly_revenue: Number(formData.monthly_revenue) || 0,
+        funding_purpose: formData.funding_purpose?.trim() || '',
+        payback_time: formData.payback_time?.trim() || '',
+        has_mca_history: Boolean(formData.has_mca_history),
         has_defaults: formData.default_details && formData.default_details.trim() !== '' ? true : false,
-        default_details: formData.default_details || '',
+        default_details: formData.default_details?.trim() || '',
         stage: formData.stage,
         next_followup: nextFollowup || '',
         followup_priority: formData.followup_priority as "low" | "medium" | "high" | "urgent",
-        followup_notes: formData.followup_notes || '',
-        internal_notes: formData.internal_notes || '',
+        followup_notes: formData.followup_notes?.trim() || '',
+        internal_notes: formData.internal_notes?.trim() || '',
         current_positions: positions,
         created_at: lead.created_at,
         updated_at: new Date().toISOString(),
-        client_timezone: formData.client_timezone || 'America/New_York',
+        client_timezone: formData.client_timezone?.trim() || 'America/New_York',
       }
 
       console.log('🔄 Edit Lead: About to update with stage:', updatedLead.stage)

@@ -178,32 +178,32 @@ export const leadService = {
       // Separate positions from lead data and remove read-only fields
       const { current_positions, created_at, updated_at, ...leadWithoutPositions } = lead
 
-      // Clean up the data - convert empty strings to null for database
-      // Don't include id in the update data since it's the primary key
+      // Clean up the data - ensure proper data types and null handling
       const cleanedLeadData = {
-        business_name: leadWithoutPositions.business_name,
-        owner_name: leadWithoutPositions.owner_name,
-        phone: leadWithoutPositions.phone,
-        email: leadWithoutPositions.email === '' ? null : leadWithoutPositions.email,
-        business_type: leadWithoutPositions.business_type === '' ? null : leadWithoutPositions.business_type,
-        business_type_details: leadWithoutPositions.business_type_details === '' ? null : leadWithoutPositions.business_type_details,
-        credit_score: leadWithoutPositions.credit_score === 0 ? null : leadWithoutPositions.credit_score,
-        funding_amount: leadWithoutPositions.funding_amount === 0 ? null : leadWithoutPositions.funding_amount,
-        monthly_revenue: leadWithoutPositions.monthly_revenue === 0 ? null : leadWithoutPositions.monthly_revenue,
-        funding_purpose: leadWithoutPositions.funding_purpose === '' ? null : leadWithoutPositions.funding_purpose,
-        payback_time: leadWithoutPositions.payback_time === '' ? null : leadWithoutPositions.payback_time,
-        has_mca_history: leadWithoutPositions.has_mca_history,
-        has_defaults: leadWithoutPositions.has_defaults,
-        default_details: leadWithoutPositions.default_details === '' ? null : leadWithoutPositions.default_details,
+        business_name: leadWithoutPositions.business_name.trim(),
+        owner_name: leadWithoutPositions.owner_name.trim(),
+        phone: leadWithoutPositions.phone.trim(),
+        email: leadWithoutPositions.email?.trim() || null,
+        business_type: leadWithoutPositions.business_type?.trim() || null,
+        business_type_details: leadWithoutPositions.business_type_details?.trim() || null,
+        credit_score: leadWithoutPositions.credit_score || null,
+        funding_amount: leadWithoutPositions.funding_amount || null,
+        monthly_revenue: leadWithoutPositions.monthly_revenue || null,
+        funding_purpose: leadWithoutPositions.funding_purpose?.trim() || null,
+        payback_time: leadWithoutPositions.payback_time?.trim() || null,
+        has_mca_history: Boolean(leadWithoutPositions.has_mca_history),
+        has_defaults: Boolean(leadWithoutPositions.has_defaults),
+        default_details: leadWithoutPositions.default_details?.trim() || null,
         stage: leadWithoutPositions.stage,
-        next_followup: leadWithoutPositions.next_followup === '' ? null : leadWithoutPositions.next_followup,
-        followup_priority: leadWithoutPositions.followup_priority === '' ? null : leadWithoutPositions.followup_priority,
-        followup_notes: leadWithoutPositions.followup_notes === '' ? null : leadWithoutPositions.followup_notes,
-        internal_notes: leadWithoutPositions.internal_notes === '' ? null : leadWithoutPositions.internal_notes,
-        client_timezone: leadWithoutPositions.client_timezone === '' ? null : leadWithoutPositions.client_timezone
+        next_followup: leadWithoutPositions.next_followup?.trim() || null,
+        followup_priority: leadWithoutPositions.followup_priority?.trim() || null,
+        followup_notes: leadWithoutPositions.followup_notes?.trim() || null,
+        internal_notes: leadWithoutPositions.internal_notes?.trim() || null,
+        client_timezone: leadWithoutPositions.client_timezone?.trim() || null
       }
       
       console.log('📊 Cleaned data for update:', cleanedLeadData)
+      console.log('🎯 Updating lead ID:', lead.id)
 
       // Update the lead
       const { data: updatedLead, error: leadError } = await supabase
@@ -215,7 +215,12 @@ export const leadService = {
 
       if (leadError) {
         console.error('❌ Supabase update error:', leadError)
-        throw leadError
+        console.error('❌ Data that failed:', cleanedLeadData)
+        throw new Error(`Database update failed: ${leadError.message}`)
+      }
+      
+      if (!updatedLead) {
+        throw new Error('No data returned from update operation')
       }
       
       console.log('✅ Lead updated successfully:', updatedLead)
@@ -249,7 +254,11 @@ export const leadService = {
       }
     } catch (error) {
       console.error('❌ Error updating lead:', error)
-      throw new Error(`Failed to update lead: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      if (error instanceof Error) {
+        throw new Error(`Failed to update lead: ${error.message}`)
+      } else {
+        throw new Error('Failed to update lead: Unknown error')
+      }
     }
   },
 
